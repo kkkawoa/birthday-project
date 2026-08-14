@@ -547,113 +547,141 @@
 
         // ==================== 时间线（视频使用 img 封面） ====================
         function renderPhotos(){
-            const grid=document.getElementById('photoGrid');
-            grid.innerHTML='';
-            config.photos.forEach((photo, index) => {
-                const card = document.createElement('div');
-                card.className = 'flip-card';
-                card.id = 'memory-card-' + index;
+    const grid = document.getElementById('photoGrid');
+    grid.innerHTML = '';
+    config.photos.forEach((photo, index) => {
+        const card = document.createElement('div');
+        card.className = 'flip-card';
+        card.id = 'memory-card-' + index;
 
-                if (photo.type === 'video') {
-                    card.innerHTML = `
-                        <div class="flip-card-inner">
-                            <div class="flip-card-front" style="position:relative; overflow:hidden;">
-                                <img src="${photo.poster || 'video-placeholder.jpg'}" alt="视频封面" class="video-cover" style="width:100%;height:100%;object-fit:cover;display:block;">
-                                <video src="${photo.src}" preload="none" muted playsinline class="video-player" style="width:100%;height:100%;object-fit:cover;display:none;"></video>
-                                <div class="video-icon" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3rem;color:white;text-shadow:0 0 20px rgba(0,0,0,0.8);pointer-events:none;">▶️</div>
-                                <div class="photo-caption">${photo.caption}</div>
-                            </div>
-                            <div class="flip-card-back">
-                                <div class="back-text">${photo.backText || '这一刻，我永远记得 ❤️'}</div>
-                                <button class="back-btn" onclick="event.stopPropagation(); openVideoModal(config.photos[${index}])">播放视频</button>
-                            </div>
-                        </div>
-                    `;
+        if (photo.type === 'video') {
+            // 使用 div 包裹视频和封面，更稳定
+            const frontDiv = document.createElement('div');
+            frontDiv.className = 'flip-card-front';
+            frontDiv.style.position = 'relative';
+            frontDiv.style.overflow = 'hidden';
 
-                    const front = card.querySelector('.flip-card-front');
-                    const img = front.querySelector('.video-cover');
-                    const video = front.querySelector('.video-player');
+            // 封面图
+            const img = document.createElement('img');
+            img.src = photo.poster || 'video-placeholder.jpg';
+            img.alt = '视频封面';
+            img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+            frontDiv.appendChild(img);
 
-                    front.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        if (card.classList.contains('flipped')) {
-                            card.classList.remove('flipped');
-                        }
-                        if (video.style.display !== 'none' && !video.paused) {
-                            video.pause();
-                            video.style.display = 'none';
-                            img.style.display = 'block';
-                            return;
-                        }
-                        img.style.display = 'none';
-                        video.style.display = 'block';
-                        // 添加加载状态
-                        const loading = document.createElement('div');
-                        loading.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:0.9rem;background:rgba(0,0,0,0.6);padding:6px 14px;border-radius:20px;pointer-events:none;z-index:10;';
-                        loading.textContent = '加载中...';
-                        front.appendChild(loading);
-                        video.load();
-                        video.play().then(() => {
-                            loading.remove();
-                        }).catch(err => {
-                            loading.textContent = '加载失败，请重试';
-                            setTimeout(() => loading.remove(), 1500);
-                            video.style.display = 'none';
-                            img.style.display = 'block';
-                            console.error('视频播放失败:', err);
-                        });
-                    });
+            // 视频元素
+            const video = document.createElement('video');
+            video.src = photo.src;
+            video.preload = 'none';
+            video.muted = true;
+            video.playsInline = true;
+            video.style.cssText = 'width:100%;height:100%;object-fit:cover;display:none;';
+            frontDiv.appendChild(video);
 
-                    video.addEventListener('ended', function() {
-                        video.style.display = 'none';
-                        img.style.display = 'block';
-                        video.currentTime = 0;
-                    });
+            // 播放图标
+            const icon = document.createElement('div');
+            icon.className = 'video-icon';
+            icon.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3rem;color:white;text-shadow:0 0 20px rgba(0,0,0,0.8);pointer-events:none;';
+            icon.textContent = '▶️';
+            frontDiv.appendChild(icon);
 
-                    video.addEventListener('error', function(e) {
-                        console.error('视频加载错误:', video.error);
-                        video.style.display = 'none';
-                        img.style.display = 'block';
-                    });
-                } else {
-                    card.innerHTML = `
-                        <div class="flip-card-inner">
-                            <div class="flip-card-front">
-                                <img src="${photo.src}" alt="回忆" loading="lazy" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22500%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23333%22/><text x=%2250%25%22 y=%2250%25%22 fill=%22%23fff%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2220%22>回忆</text></svg>'">
-                                <div class="photo-caption">${photo.caption}</div>
-                            </div>
-                            <div class="flip-card-back">
-                                <div class="back-text">${photo.backText || '这一刻，我永远记得 ❤️'}</div>
-                                <button class="back-btn" onclick="event.stopPropagation(); openPhotoModal(config.photos[${index}])">查看大图</button>
-                            </div>
-                        </div>
-                    `;
+            // 标题
+            const caption = document.createElement('div');
+            caption.className = 'photo-caption';
+            caption.textContent = photo.caption;
+            frontDiv.appendChild(caption);
+
+            // 点击事件
+            frontDiv.addEventListener('click', function(e) {
+                e.stopPropagation();
+                // 如果卡片翻转，翻回正面
+                if (card.classList.contains('flipped')) {
+                    card.classList.remove('flipped');
                 }
-
-                card.addEventListener('click', function(e) {
-                    if (e.target.tagName === 'BUTTON') return;
-                    if (photo.type === 'video') {
-                        const videoEl = this.querySelector('.video-player');
-                        if (videoEl && videoEl.style.display !== 'none' && !videoEl.paused) {
-                            return;
-                        }
-                    }
-                    this.classList.toggle('flipped');
-                    markAsViewed(index);
+                // 如果视频正在播放，暂停回到封面
+                if (video.style.display !== 'none' && !video.paused) {
+                    video.pause();
+                    video.style.display = 'none';
+                    img.style.display = 'block';
+                    return;
+                }
+                // 否则尝试播放视频
+                img.style.display = 'none';
+                video.style.display = 'block';
+                // 直接播放，不调用 load() 避免加载延迟
+                video.play().then(() => {
+                    console.log('✅ 视频播放成功:', photo.src);
+                }).catch(err => {
+                    console.error('❌ 视频播放失败:', err);
+                    // 播放失败，恢复封面
+                    video.style.display = 'none';
+                    img.style.display = 'block';
+                    // 提示用户使用弹窗播放
+                    alert('视频加载失败，请点击"播放视频"按钮在弹窗中观看。');
                 });
-
-                grid.appendChild(card);
             });
-            updateProgress();
-        }
-        function markAsViewed(index){ if(!viewedMemories.has(index)){ viewedMemories.add(index); updateProgress(); } }
-        function updateProgress(){ const total=config.photos.length; const viewed=viewedMemories.size; const percent=total>0?Math.round((viewed/total)*100):0; document.getElementById('progressPercent').textContent=percent; document.getElementById('progressBarInner').style.width=percent+'%'; }
-        function randomMemory(){ const cards=document.querySelectorAll('.flip-card'); if(cards.length===0)return; const idx=Math.floor(Math.random()*cards.length); const target=cards[idx]; target.scrollIntoView({behavior:'smooth',block:'center'}); target.classList.add('highlight-card'); setTimeout(()=>target.classList.remove('highlight-card'),2000); }
-        function openPhotoModal(photo){ document.getElementById('photoModalImg').src=photo.src; document.getElementById('photoModalCaption').textContent=photo.caption; document.getElementById('photoModal').classList.add('active'); }
-        function closePhotoModal(){ document.getElementById('photoModal').classList.remove('active'); document.getElementById('photoModalImg').src=""; }
-        function openVideoModal(photo){ const v=document.getElementById('videoModalPlayer'); v.onerror=null; v.src=photo.src; v.setAttribute('playsinline',''); v.setAttribute('controls',''); document.getElementById('videoModalCaption').textContent=photo.caption; document.getElementById('videoModal').classList.add('active'); v.play().catch(()=>{}); v.onerror=function(){ alert('视频加载失败，请检查文件路径或格式是否支持。'); closeVideoModal(); }; }
-        function closeVideoModal(){ const v=document.getElementById('videoModalPlayer'); v.pause(); v.onerror=null; v.src=""; document.getElementById('videoModal').classList.remove('active'); }
 
+            // 视频结束回到封面
+            video.addEventListener('ended', function() {
+                video.style.display = 'none';
+                img.style.display = 'block';
+                video.currentTime = 0;
+            });
+
+            // 错误处理
+            video.addEventListener('error', function(e) {
+                console.error('视频加载错误:', video.error);
+                video.style.display = 'none';
+                img.style.display = 'block';
+            });
+
+            // 构建卡片
+            card.innerHTML = `
+                <div class="flip-card-inner">
+                    <div class="flip-card-front-wrapper"></div>
+                    <div class="flip-card-back">
+                        <div class="back-text">${photo.backText || '这一刻，我永远记得 ❤️'}</div>
+                        <button class="back-btn" onclick="event.stopPropagation(); openVideoModal(config.photos[${index}])">播放视频</button>
+                    </div>
+                </div>
+            `;
+            // 将 frontDiv 放入 .flip-card-front-wrapper
+            const wrapper = card.querySelector('.flip-card-front-wrapper');
+            wrapper.appendChild(frontDiv);
+            // 添加 class 使样式生效
+            wrapper.className = 'flip-card-front';
+        } else {
+            // 图片卡片（保持不变）
+            card.innerHTML = `
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <img src="${photo.src}" alt="回忆" loading="lazy" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22500%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23333%22/><text x=%2250%25%22 y=%2250%25%22 fill=%22%23fff%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2220%22>回忆</text></svg>'">
+                        <div class="photo-caption">${photo.caption}</div>
+                    </div>
+                    <div class="flip-card-back">
+                        <div class="back-text">${photo.backText || '这一刻，我永远记得 ❤️'}</div>
+                        <button class="back-btn" onclick="event.stopPropagation(); openPhotoModal(config.photos[${index}])">查看大图</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 翻转逻辑
+        card.addEventListener('click', function(e) {
+            if (e.target.tagName === 'BUTTON') return;
+            if (photo.type === 'video') {
+                const videoEl = this.querySelector('video');
+                if (videoEl && videoEl.style.display !== 'none' && !videoEl.paused) {
+                    return;
+                }
+            }
+            this.classList.toggle('flipped');
+            markAsViewed(index);
+        });
+
+        grid.appendChild(card);
+    });
+    updateProgress();
+}
         // ==================== 情书 ====================
         function renderLetter(){
             const div=document.getElementById('letterContent');
