@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 添加 referrer 策略，解决地图 403 问题 -->
+    <meta name="referrer" content="no-referrer" />
     <title>生日快乐，我的宝贝</title>
     <!-- 使用国内 CDN 加速 -->
     <script src="https://cdn.bootcdn.net/ajax/libs/canvas-confetti/1.6.0/confetti.browser.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
     <style>
-        /* 所有样式与之前一致，此处因篇幅省略，但实际代码已包含全部样式 */
-        /* 此段仅为占位，实际完整代码会在下方直接提供 */
+        /* ===== 全局样式 ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --bg-dark: #1a1a2e;
@@ -61,7 +62,7 @@
         }
         .container { max-width: 600px; width: 100%; text-align: center; position: relative; z-index: 2; }
 
-        /* 首页布局（地图在右侧） */
+        /* ===== 首页布局（地图在右侧） ===== */
         .home-layout {
             display: flex;
             flex-wrap: wrap;
@@ -132,7 +133,7 @@
             .home-layout .home-map-wrapper { padding: 14px; }
         }
 
-        /* 以下样式与之前完全一致，因内容太长省略，但实际代码中已完整包含 */
+        /* ===== 其余样式（与之前一致） ===== */
         h1 { font-size: 2.8rem; margin-bottom: 20px; text-shadow: 0 0 25px rgba(255,105,157,0.9); animation: float 3s ease-in-out infinite; color: var(--pink-light); }
         h2 { font-size: 1.9rem; margin-bottom: 15px; color: var(--pink-light); }
         p { font-size: 1.1rem; line-height: 1.8; margin-bottom: 15px; color: var(--text-secondary); }
@@ -297,14 +298,10 @@
         .side-scroll-img { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; margin: 5px auto; border: 2px solid rgba(255,255,255,0.3); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .side-scroll-placeholder { width: 80px; height: 80px; border-radius: 12px; margin: 5px auto; border: 2px solid rgba(255,255,255,0.3); background: #555; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #fff; }
         @keyframes scrollVertical { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
-        /* 样式结束 */
     </style>
 </head>
 <body>
-    <!-- 页面结构与之前完全一致（包含密码页、首页、地图、时间线、情书、问答、蛋糕、愿望、数据、最终页等） -->
-    <!-- 由于篇幅，此处略去完整 HTML 结构，但实际代码中已全部包含 -->
-    <!-- 你可以在本地保存时，从历史消息中复制完整结构，或直接使用下面压缩的版本 -->
-    <!-- 我在这里提供完整可运行版本，但为了简洁，只展示主体框架，实际复制时请确保全部 -->
+    <!-- 页面结构（与之前相同，完整包含所有页面） -->
     <div class="stars" id="starsContainer"></div>
     <div class="music-btn" id="musicBtn" title="播放音乐/切换歌曲"><div class="btn-record"></div></div>
     <div class="visualizer" id="visualizer"><span class="note">🎵</span><span class="note">🎶</span><span class="note">🎵</span><span class="note">🎶</span><span class="note">🎵</span></div>
@@ -383,7 +380,7 @@
     <audio id="bgMusic"></audio>
 
     <script>
-        // 配置对象（与之前完全一致，包含所有图片、音乐、问卷等数据）
+        // ==================== 配置 ====================
         const config = {
             password: "20030904",
             birthday: "2003-09-04",
@@ -437,9 +434,15 @@
                 { question: "爱情当中最重要的是什么？", options: ["爱","金钱","外貌","陪伴"], correct: 0, explanation: "有爱就有情，相爱可抵万难" }
             ],
             wishCoupons: [
-                { emoji: "💆‍♀️", text: "按摩券" }, { emoji: "🍰", text: "美食券" }, { emoji: "✈️", text: "旅行券" },
-                { emoji: "🛍️", text: "购物券" }, { emoji: "😴", text: "懒觉券" }, { emoji: "💋", text: "亲亲券" },
-                { emoji: "🎬", text: "电影券" }, { emoji: "🌹", text: "鲜花券" }, { emoji: "glue.png", text: "和好券" }
+                { emoji: "💆‍♀️", text: "按摩券" },
+                { emoji: "🍰", text: "美食券" },
+                { emoji: "✈️", text: "旅行券" },
+                { emoji: "🛍️", text: "购物券" },
+                { emoji: "😴", text: "懒觉券" },
+                { emoji: "💋", text: "亲亲券" },
+                { emoji: "🎬", text: "电影券" },
+                { emoji: "🌹", text: "鲜花券" },
+                { emoji: "🩹", text: "和好券" }  // 替换为 emoji
             ],
             stats: [
                 { number: 965, label: "在一起的天数" }, { number: "9999+", label: "一起拍过的照片" },
@@ -535,7 +538,7 @@
         // ==================== 盲盒 ====================
         function renderGifts(){ const g=document.getElementById('giftGrid'); if(!g)return; g.innerHTML=''; config.gifts.forEach((gift,index)=>{ const box=document.createElement('div'); box.className='gift-box closed'; box.innerHTML=`<div class="gift-icon">🎁</div><div class="gift-hint">点击拆开</div><div class="gift-content"><img src="${gift.img}" alt="${gift.name}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22120%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23333%22/><text x=%2250%25%22 y=%2250%25%22 fill=%22%23fff%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2212%22>礼物图片</text></svg>'"><div class="gift-name">${gift.name}</div></div>`; box.addEventListener('click',function(){ if(this.classList.contains('closed')){ this.classList.remove('closed'); this.classList.add('opened'); launchConfetti(); } }); g.appendChild(box); }); }
 
-        // ==================== 时间线（视频 preload='none' 已添加） ====================
+        // ==================== 时间线 ====================
         function renderPhotos(){
             const grid=document.getElementById('photoGrid');
             grid.innerHTML='';
@@ -544,7 +547,7 @@
                 card.className='flip-card';
                 card.id='memory-card-'+index;
                 if(photo.type==='video'){
-                    const preloadAttr = photo.preload || 'none'; // 强制使用 none
+                    const preloadAttr = photo.preload || 'none';
                     card.innerHTML=`<div class="flip-card-inner"><div class="flip-card-front"><video src="${photo.src}" preload="${preloadAttr}" muted playsinline style="width:100%;height:100%;object-fit:cover;"></video><div class="video-icon">▶️</div><div class="photo-caption">${photo.caption}</div></div><div class="flip-card-back"><div class="back-text">${photo.backText||'这一刻，我永远记得 ❤️'}</div><button class="back-btn" onclick="event.stopPropagation(); openVideoModal(config.photos[${index}])">播放视频</button></div></div>`;
                 }else{
                     card.innerHTML=`<div class="flip-card-inner"><div class="flip-card-front"><img src="${photo.src}" alt="回忆" loading="lazy" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22500%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23333%22/><text x=%2250%25%22 y=%2250%25%22 fill=%22%23fff%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2220%22>回忆</text></svg>'"><div class="photo-caption">${photo.caption}</div></div><div class="flip-card-back"><div class="back-text">${photo.backText||'这一刻，我永远记得 ❤️'}</div><button class="back-btn" onclick="event.stopPropagation(); openPhotoModal(config.photos[${index}])">查看大图</button></div></div>`;
@@ -590,7 +593,7 @@
         function toggleFutureItem(index,element){ element.classList.toggle('checked'); const icon=element.querySelector('.check-icon'); icon.textContent=element.classList.contains('checked')?'✅':'◻️'; const allItems=document.querySelectorAll('.future-item'); const allChecked=Array.from(allItems).every(item=>item.classList.contains('checked')); document.getElementById('futureCompleteMessage').style.display=allChecked?'block':'none'; }
         function renderSideScrollPhotos(){ const left=document.getElementById('sideScrollLeft'),right=document.getElementById('sideScrollRight'); if(!left||!right)return; let photos=config.sidePhotos||[]; if(photos.length===0){ const placeholders=['#ff6b9d','#ffd700','#667eea','#4caf50','#ff8e8e','#ffb6c1','#ffa07a']; for(let i=0;i<15;i++) photos.push(placeholders[i%placeholders.length]); } const half=Math.floor(photos.length/2); const leftPhotos=photos.slice(0,half),rightPhotos=photos.slice(half); left.innerHTML=''; right.innerHTML=''; function createTrack(photos){ const track=document.createElement('div'); track.className='side-scroll-track'; for(let repeat=0;repeat<2;repeat++){ photos.forEach(src=>{ const img=document.createElement('img'); img.src=src; img.alt="回忆"; img.className='side-scroll-img'; img.onerror=function(){ const ph=document.createElement('div'); ph.className='side-scroll-placeholder'; if(src.startsWith('#')){ ph.style.background=src; ph.textContent='📷'; }else{ ph.style.background='#555'; ph.textContent='📷'; } this.parentNode.replaceChild(ph,this); }; track.appendChild(img); }); } return track; } left.appendChild(createTrack(leftPhotos)); right.appendChild(createTrack(rightPhotos)); }
 
-        // ==================== 问卷 ====================
+        // ==================== 问卷（已修复） ====================
         function openSurvey(){ const container=document.getElementById('surveyQuestions'); container.innerHTML=''; config.surveyQuestions.forEach((q,index)=>{ const div=document.createElement('div'); div.className='question-item'; div.innerHTML=`<label>${index+1}. ${q}</label><textarea id="surveyAns${index}" rows="2"></textarea>`; container.appendChild(div); }); document.getElementById('surveyModal').classList.add('active'); }
         function closeSurvey(){ document.getElementById('surveyModal').classList.remove('active'); }
         function submitSurvey(){
@@ -598,13 +601,37 @@
             const answers={}; for(let i=0;i<config.surveyQuestions.length;i++){ const ans=document.getElementById(`surveyAns${i}`).value.trim(); answers[config.surveyQuestions[i]]=ans; }
             const choices=window.selectedChoices||{};
             const data={ answers, choices };
-            const SUPABASE_URL='https://hfqhkiouvtyxwcorutb.supabase.co';
-            const SUPABASE_ANON_KEY='sb_publishable_o2a_0XwT9a8RPLGf39wjXg_8wQqTkvE';
-            fetch(SUPABASE_URL+'/rest/v1/surveys', {
-                method:'POST',
-                headers:{ 'Content-Type':'application/json', 'apikey':SUPABASE_ANON_KEY, 'Authorization':'Bearer '+SUPABASE_ANON_KEY },
-                body:JSON.stringify(data)
-            }).then(res=>{ if(res.ok){ alert('问卷提交成功！谢谢你 💖'); closeSurvey(); document.getElementById('secondQuestionModal').classList.add('active'); document.getElementById('secondQuestionResult').style.display='none'; surveyCompleted=true; }else{ return res.json().then(err=>{throw new Error(JSON.stringify(err));}); } }).catch(err=>{ console.error('提交错误:',err); alert('提交失败，请检查网络或稍后重试。'); });
+
+            const SUPABASE_URL = 'https://hfqhkiouvtyxwcorutb.supabase.co';
+            const SUPABASE_ANON_KEY = 'sb_publishable_o2a_0XwT9a8RPLGf39wjXg_8wQqTkvE';
+
+            fetch(SUPABASE_URL + '/rest/v1/surveys', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+                },
+                body: JSON.stringify(data)
+            })
+            .then(async res => {
+                if (!res.ok) {
+                    const errText = await res.text();
+                    throw new Error(`HTTP ${res.status}: ${errText}`);
+                }
+                return res.json();
+            })
+            .then(result => {
+                alert('✅ 问卷提交成功！谢谢你 💖');
+                closeSurvey();
+                document.getElementById('secondQuestionModal').classList.add('active');
+                document.getElementById('secondQuestionResult').style.display = 'none';
+                surveyCompleted = true;
+            })
+            .catch(err => {
+                console.error('提交错误:', err);
+                alert('❌ 提交失败，错误详情：' + err.message + '\n请查看控制台（F12）获取完整信息。');
+            });
         }
         function answerSecondQuestion(choice){ const resultDiv=document.getElementById('secondQuestionResult'); resultDiv.style.display='block'; if(choice==='想'){ resultDiv.innerHTML='💖 我也很想你，联系我吧 💖'; }else{ resultDiv.innerHTML='🌙 没关系，我一直在想你 🌙'; } document.querySelectorAll('#secondQuestionModal .second-question-buttons .btn').forEach(btn=>btn.disabled=true); resultDiv.scrollIntoView({behavior:'smooth',block:'center'}); }
         function closeSecondQuestion(){ document.getElementById('secondQuestionModal').classList.remove('active'); }
@@ -616,15 +643,59 @@
         function agreeForever(){ document.getElementById('gameModal').classList.remove('active'); createHeartExplosion(); if(typeof confetti!=='undefined'){ confetti({particleCount:200,spread:100,origin:{y:0.6},colors:['#ff6b9d','#ffd700','#ff8e8e','#ffffff']}); } setTimeout(()=>{ showPage('page-final'); },1200); }
         function createHeartExplosion(){ const container=document.body; const hearts=['❤️','💖','💕','💗','💘','💝']; for(let i=0;i<80;i++){ const heart=document.createElement('div'); heart.textContent=hearts[Math.floor(Math.random()*hearts.length)]; heart.style.cssText=`position:fixed;top:50%;left:50%;font-size:${Math.random()*30+20}px;z-index:1000;pointer-events:none;animation:heartBurst ${1.5+Math.random()*2}s ease-out forwards;`; const angle=Math.random()*Math.PI*2; const distance=100+Math.random()*300; const dx=Math.cos(angle)*distance; const dy=Math.sin(angle)*distance; heart.style.setProperty('--dx',dx+'px'); heart.style.setProperty('--dy',dy+'px'); container.appendChild(heart); setTimeout(()=>heart.remove(),3500); } }
 
-        // ==================== 地图 ====================
+        // ==================== 地图（已优化缓存） ====================
         function initTravelMap(){
-            const container=document.getElementById('travelMap'); if(!container)return; if(mapChart){ mapChart.dispose(); mapChart=null; }
-            const loading=document.getElementById('mapLoading');
-            if(loading) loading.style.display='flex';
-            if(typeof echarts==='undefined'){ if(loading) loading.innerHTML='<span style="color:#ff8a8a;">地图库加载失败，请刷新重试</span>'; return; }
-            mapChart=echarts.init(container);
-            const geoUrl='https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json';
-            fetch(geoUrl,{mode:'cors'}).then(res=>{ if(!res.ok) throw new Error('HTTP '+res.status); return res.json(); }).then(data=>{ echarts.registerMap('china',data); mapDataLoaded=true; if(loading) loading.style.display='none'; renderMap(); window.addEventListener('resize',onMapResize); }).catch(err=>{ console.error('地图加载失败:',err); if(loading){ loading.innerHTML=`<span style="font-size:2rem;">🗺️</span><span>地图数据加载失败，请检查网络</span><button class="btn btn-secondary" style="padding:8px 20px;font-size:0.85rem;margin-top:8px;" onclick="initTravelMap()">重试</button>`; loading.style.display='flex'; } });
+            const container = document.getElementById('travelMap');
+            if (!container) return;
+            if (mapChart) { mapChart.dispose(); mapChart = null; }
+
+            const loading = document.getElementById('mapLoading');
+            if (loading) loading.style.display = 'flex';
+            if (typeof echarts === 'undefined') {
+                if (loading) loading.innerHTML = '<span style="color:#ff8a8a;">地图库加载失败，请刷新重试</span>';
+                return;
+            }
+
+            mapChart = echarts.init(container);
+
+            // 尝试从 localStorage 读取缓存
+            const cachedGeo = localStorage.getItem('china_geo');
+            if (cachedGeo) {
+                try {
+                    const geoData = JSON.parse(cachedGeo);
+                    echarts.registerMap('china', geoData);
+                    mapDataLoaded = true;
+                    if (loading) loading.style.display = 'none';
+                    renderMap();
+                    window.addEventListener('resize', onMapResize);
+                    return;
+                } catch (e) { console.warn('缓存数据无效，重新加载'); }
+            }
+
+            // 无缓存，请求数据
+            const geoUrl = 'https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json';
+            fetch(geoUrl, { mode: 'cors' })
+                .then(res => { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
+                .then(data => {
+                    // 存入缓存
+                    try { localStorage.setItem('china_geo', JSON.stringify(data)); } catch (e) {}
+                    echarts.registerMap('china', data);
+                    mapDataLoaded = true;
+                    if (loading) loading.style.display = 'none';
+                    renderMap();
+                    window.addEventListener('resize', onMapResize);
+                })
+                .catch(err => {
+                    console.error('地图加载失败:', err);
+                    if (loading) {
+                        loading.innerHTML = `
+                            <span style="font-size:2rem;">🗺️</span>
+                            <span>地图数据加载失败，请检查网络</span>
+                            <button class="btn btn-secondary" style="padding:8px 20px;font-size:0.85rem;margin-top:8px;" onclick="initTravelMap()">重试</button>
+                        `;
+                        loading.style.display = 'flex';
+                    }
+                });
         }
         function renderMap(){
             if(!mapChart||!mapDataLoaded)return;
