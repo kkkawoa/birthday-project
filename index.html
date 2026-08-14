@@ -402,11 +402,12 @@
                 { src: "16.jpg", caption: "记录第一次全款拿下喜欢的包包", backText: "独立女人最有魅力" },
                 { src: "17.jpg", caption: "总是喜欢趁我睡觉偷拍", backText: "什么样的我你也觉得好看" },
                 { src: "18.jpg", caption: "女司机第一次上路", backText: "坐你的车我放心" },
-                { src: "video1.mp4", caption: "俩个懒人的较真", type: "video", backText: "实际上我都做了", preload: "metadata" },
-                { src: "video2.mp4", caption: "我在这儿等着你回来", type: "video", backText: "等你，永远不嫌久", preload: "metadata" },
-                { src: "video3.mp4", caption: "工作状态不敢打扰她", type: "video", backText: "认真的你最有魅力", preload: "metadata" },
-                { src: "video4.mp4", caption: "激动地拆情绪盒子", type: "video", backText: "这或许就是情绪盒子的意义", preload: "metadata" },
-                { src: "video5.mp4", caption: "如果真的有关系复原胶就好了", type: "video", backText: "我们的关系不需要复原，只需要延续", preload: "metadata" }
+                // 视频配置：使用封面图，不预加载
+                { src: "video1.mp4", caption: "俩个懒人的较真", type: "video", backText: "实际上我都做了", preload: "none", poster: "video1.jpg" },
+                { src: "video2.mp4", caption: "我在这儿等着你回来", type: "video", backText: "等你，永远不嫌久", preload: "none", poster: "video2.jpg" },
+                { src: "video3.mp4", caption: "工作状态不敢打扰她", type: "video", backText: "认真的你最有魅力", preload: "none", poster: "video3.jpg" },
+                { src: "video4.mp4", caption: "激动地拆情绪盒子", type: "video", backText: "这或许就是情绪盒子的意义", preload: "none", poster: "video4.jpg" },
+                { src: "video5.mp4", caption: "如果真的有关系复原胶就好了", type: "video", backText: "我们的关系不需要复原，只需要延续", preload: "none", poster: "video5.jpg" }
             ],
             loveLetter: `亲爱的宝贝：\n\n生日快乐！今天是你一年中最特别的日子，而我只想让你知道，遇见你是我这辈子最大的幸运。\n\n从我们相识的那一天起，我的世界就变得不一样了。你的笑容、你的声音、你每一个小动作，都让我觉得无比温暖。谢谢你出现在我的生命里，陪我走过那么多美好的时光。\n\n愿你的每一天都充满阳光和欢笑，愿你的每一个愿望都能实现。我会一直陪在你身边，爱你、宠你、保护你。\n\n你总说自己很焦虑，我想告诉你，不必总是逼自己坚强，焦虑和疲惫都不是错。很多时刻你已经很努力在撑了，不用事事都做到完美。有些压力不用一个人默默扛下，你可以脆弱，可以感到迷茫。就算问题不会马上消失，你的情绪也值得被好好接纳，我会一直站在你的身后。\n\n永远爱你的我 💕`,
             questions: [
@@ -477,7 +478,6 @@
             document.getElementById(pageId).classList.add('active');
             if(pageId==='page-password'||pageId==='page-timeline') showHearts(); else hideHearts();
             if(pageId==='page-timeline'){ renderPhotos(); updateProgress(); }
-            // 当切换到首页时，延迟调用地图（确保页面渲染完成）
             if(pageId==='page-home'){
                 setTimeout(() => { initTravelMap(); }, 200);
             }
@@ -507,7 +507,6 @@
                 btn.innerHTML='<span class="btn-text">正在开启...</span><span class="spinner"></span>';
                 setTimeout(()=>{
                     showPage('page-home');
-                    // 登录后再次调用地图
                     setTimeout(()=>{ initTravelMap(); }, 300);
                     initHome();
                     startMusic();
@@ -537,7 +536,7 @@
         // ==================== 盲盒 ====================
         function renderGifts(){ const g=document.getElementById('giftGrid'); if(!g)return; g.innerHTML=''; config.gifts.forEach((gift,index)=>{ const box=document.createElement('div'); box.className='gift-box closed'; box.innerHTML=`<div class="gift-icon">🎁</div><div class="gift-hint">点击拆开</div><div class="gift-content"><img src="${gift.img}" alt="${gift.name}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22120%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23333%22/><text x=%2250%25%22 y=%2250%25%22 fill=%22%23fff%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2212%22>礼物图片</text></svg>'"><div class="gift-name">${gift.name}</div></div>`; box.addEventListener('click',function(){ if(this.classList.contains('closed')){ this.classList.remove('closed'); this.classList.add('opened'); launchConfetti(); } }); g.appendChild(box); }); }
 
-        // ==================== 时间线 ====================
+        // ==================== 时间线（视频支持封面图） ====================
         function renderPhotos(){
             const grid=document.getElementById('photoGrid');
             grid.innerHTML='';
@@ -546,10 +545,34 @@
                 card.className='flip-card';
                 card.id='memory-card-'+index;
                 if(photo.type==='video'){
-                    const preloadAttr = photo.preload || 'metadata';
-                    card.innerHTML=`<div class="flip-card-inner"><div class="flip-card-front"><video src="${photo.src}" preload="${preloadAttr}" muted playsinline style="width:100%;height:100%;object-fit:cover;"></video><div class="video-icon">▶️</div><div class="photo-caption">${photo.caption}</div></div><div class="flip-card-back"><div class="back-text">${photo.backText||'这一刻，我永远记得 ❤️'}</div><button class="back-btn" onclick="event.stopPropagation(); openVideoModal(config.photos[${index}])">播放视频</button></div></div>`;
+                    const preloadAttr = photo.preload || 'none';
+                    const posterAttr = photo.poster ? `poster="${photo.poster}"` : '';
+                    card.innerHTML=`
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <video src="${photo.src}" preload="${preloadAttr}" ${posterAttr} muted playsinline style="width:100%;height:100%;object-fit:cover;"></video>
+                                <div class="video-icon">▶️</div>
+                                <div class="photo-caption">${photo.caption}</div>
+                            </div>
+                            <div class="flip-card-back">
+                                <div class="back-text">${photo.backText||'这一刻，我永远记得 ❤️'}</div>
+                                <button class="back-btn" onclick="event.stopPropagation(); openVideoModal(config.photos[${index}])">播放视频</button>
+                            </div>
+                        </div>
+                    `;
                 }else{
-                    card.innerHTML=`<div class="flip-card-inner"><div class="flip-card-front"><img src="${photo.src}" alt="回忆" loading="lazy" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22500%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23333%22/><text x=%2250%25%22 y=%2250%25%22 fill=%22%23fff%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2220%22>回忆</text></svg>'"><div class="photo-caption">${photo.caption}</div></div><div class="flip-card-back"><div class="back-text">${photo.backText||'这一刻，我永远记得 ❤️'}</div><button class="back-btn" onclick="event.stopPropagation(); openPhotoModal(config.photos[${index}])">查看大图</button></div></div>`;
+                    card.innerHTML=`
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <img src="${photo.src}" alt="回忆" loading="lazy" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22500%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23333%22/><text x=%2250%25%22 y=%2250%25%22 fill=%22%23fff%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2220%22>回忆</text></svg>'">
+                                <div class="photo-caption">${photo.caption}</div>
+                            </div>
+                            <div class="flip-card-back">
+                                <div class="back-text">${photo.backText||'这一刻，我永远记得 ❤️'}</div>
+                                <button class="back-btn" onclick="event.stopPropagation(); openPhotoModal(config.photos[${index}])">查看大图</button>
+                            </div>
+                        </div>
+                    `;
                 }
                 card.addEventListener('click',function(){ this.classList.toggle('flipped'); markAsViewed(index); });
                 grid.appendChild(card);
@@ -634,146 +657,138 @@
         function agreeForever(){ document.getElementById('gameModal').classList.remove('active'); createHeartExplosion(); if(typeof confetti!=='undefined'){ confetti({particleCount:200,spread:100,origin:{y:0.6},colors:['#ff6b9d','#ffd700','#ff8e8e','#ffffff']}); } setTimeout(()=>{ showPage('page-final'); },1200); }
         function createHeartExplosion(){ const container=document.body; const hearts=['❤️','💖','💕','💗','💘','💝']; for(let i=0;i<80;i++){ const heart=document.createElement('div'); heart.textContent=hearts[Math.floor(Math.random()*hearts.length)]; heart.style.cssText=`position:fixed;top:50%;left:50%;font-size:${Math.random()*30+20}px;z-index:1000;pointer-events:none;animation:heartBurst ${1.5+Math.random()*2}s ease-out forwards;`; const angle=Math.random()*Math.PI*2; const distance=100+Math.random()*300; const dx=Math.cos(angle)*distance; const dy=Math.sin(angle)*distance; heart.style.setProperty('--dx',dx+'px'); heart.style.setProperty('--dy',dy+'px'); container.appendChild(heart); setTimeout(()=>heart.remove(),3500); } }
 
-        // ==================== 地图（静态两个小人） ====================
-     function initTravelMap() {
-    const canvas = document.getElementById('travelMap');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const W = canvas.width, H = canvas.height;
+        // ==================== 地图（动态两个小人） ====================
+        function initTravelMap() {
+            const canvas = document.getElementById('travelMap');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width, H = canvas.height;
 
-    // ---- 静态元素绘制函数（每帧重绘） ----
-    function drawScene(angle) {
-        // 1. 星空背景
-        const bgGrad = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W, H)*0.7);
-        bgGrad.addColorStop(0, '#0b0e2a');
-        bgGrad.addColorStop(0.5, '#1a1e4a');
-        bgGrad.addColorStop(1, '#0a0a1a');
-        ctx.fillStyle = bgGrad;
-        ctx.fillRect(0, 0, W, H);
+            function drawScene(angle) {
+                // 背景
+                const bgGrad = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W, H)*0.7);
+                bgGrad.addColorStop(0, '#0b0e2a');
+                bgGrad.addColorStop(0.5, '#1a1e4a');
+                bgGrad.addColorStop(1, '#0a0a1a');
+                ctx.fillStyle = bgGrad;
+                ctx.fillRect(0, 0, W, H);
 
-        // 星星（固定随机位置，但每帧重绘会闪烁，可以用固定种子，但我们重新生成也无所谓，因为快速闪烁也很美）
-        for (let i = 0; i < 60; i++) {
-            const x = (i * 137.508) % W; // 伪随机固定位置
-            const y = (i * 97.31) % (H * 0.8);
-            const r = 0.5 + (i % 3) * 0.8;
-            const alpha = 0.3 + (i % 5) * 0.12;
-            ctx.beginPath();
-            ctx.arc(x, y, r, 0, Math.PI*2);
-            ctx.fillStyle = `rgba(255,255,240,${alpha})`;
-            ctx.shadowColor = 'rgba(255,255,200,0.2)';
-            ctx.shadowBlur = 4;
-            ctx.fill();
+                // 星星（固定随机位置）
+                for (let i = 0; i < 60; i++) {
+                    const x = (i * 137.508) % W;
+                    const y = (i * 97.31) % (H * 0.8);
+                    const r = 0.5 + (i % 3) * 0.8;
+                    const alpha = 0.3 + (i % 5) * 0.12;
+                    ctx.beginPath();
+                    ctx.arc(x, y, r, 0, Math.PI*2);
+                    ctx.fillStyle = `rgba(255,255,240,${alpha})`;
+                    ctx.shadowColor = 'rgba(255,255,200,0.2)';
+                    ctx.shadowBlur = 4;
+                    ctx.fill();
+                }
+                ctx.shadowBlur = 0;
+
+                // 地球
+                const cx = W/2, cy = H/2;
+                const radius = Math.min(W, H) * 0.38;
+                const earthGrad = ctx.createRadialGradient(cx - radius*0.25, cy - radius*0.25, 0, cx, cy, radius);
+                earthGrad.addColorStop(0, '#80deea');
+                earthGrad.addColorStop(0.4, '#4dd0e1');
+                earthGrad.addColorStop(0.7, '#0288d1');
+                earthGrad.addColorStop(1, '#01579b');
+                ctx.beginPath();
+                ctx.arc(cx, cy, radius, 0, Math.PI*2);
+                ctx.fillStyle = earthGrad;
+                ctx.shadowColor = 'rgba(100,200,255,0.5)';
+                ctx.shadowBlur = 50;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                // 大陆
+                const continents = [
+                    { x: 0.30, y: 0.25, rx: 0.18, ry: 0.12, rot: 0.2 },
+                    { x: 0.50, y: 0.22, rx: 0.15, ry: 0.10, rot: -0.1 },
+                    { x: 0.65, y: 0.30, rx: 0.12, ry: 0.08, rot: 0.4 },
+                    { x: 0.40, y: 0.48, rx: 0.20, ry: 0.15, rot: 0.0 },
+                    { x: 0.60, y: 0.55, rx: 0.14, ry: 0.10, rot: -0.2 },
+                    { x: 0.25, y: 0.60, rx: 0.16, ry: 0.12, rot: 0.3 },
+                    { x: 0.48, y: 0.72, rx: 0.12, ry: 0.08, rot: 0.0 },
+                    { x: 0.70, y: 0.68, rx: 0.10, ry: 0.06, rot: -0.3 }
+                ];
+                continents.forEach(c => {
+                    const x = cx + (c.x - 0.5) * radius * 1.8;
+                    const y = cy + (c.y - 0.5) * radius * 1.8;
+                    const rx = c.rx * radius * 0.9;
+                    const ry = c.ry * radius * 0.9;
+                    ctx.save();
+                    ctx.translate(x, y);
+                    ctx.rotate(c.rot);
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI*2);
+                    ctx.fillStyle = 'rgba(76, 175, 80, 0.7)';
+                    ctx.shadowColor = 'rgba(76,175,80,0.3)';
+                    ctx.shadowBlur = 15;
+                    ctx.fill();
+                    ctx.restore();
+                });
+                ctx.shadowBlur = 0;
+
+                // 光环轨道
+                const orbitRadius = radius * 0.88;
+                ctx.beginPath();
+                ctx.arc(cx, cy, orbitRadius, 0, Math.PI*2);
+                ctx.strokeStyle = 'rgba(255,215,0,0.25)';
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([6, 8]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // 两个小人
+                const people = ['👦', '👧'];
+                const colors = ['#ff6b9d', '#ffd700'];
+                people.forEach((emoji, i) => {
+                    const a = angle + i * Math.PI;
+                    const x = cx + Math.cos(a) * orbitRadius;
+                    const y = cy + Math.sin(a) * orbitRadius;
+                    const glow = ctx.createRadialGradient(x, y, 0, x, y, 28);
+                    glow.addColorStop(0, colors[i] + 'bb');
+                    glow.addColorStop(1, 'transparent');
+                    ctx.fillStyle = glow;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 28, 0, Math.PI*2);
+                    ctx.fill();
+                    ctx.font = '38px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.shadowColor = colors[i];
+                    ctx.shadowBlur = 25;
+                    ctx.fillText(emoji, x, y);
+                    ctx.shadowBlur = 0;
+                });
+
+                // 底部文字
+                ctx.font = 'bold 16px "PingFang SC", "Microsoft YaHei", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.shadowColor = 'rgba(255,215,0,0.6)';
+                ctx.shadowBlur = 15;
+                ctx.fillStyle = 'rgba(255,255,255,0.8)';
+                ctx.fillText('❤️ 我们一起走遍世界 ❤️', cx, H - 18);
+                ctx.shadowBlur = 0;
+            }
+
+            let startTime = Date.now();
+            const speed = 0.0012;
+
+            function animate() {
+                const elapsed = Date.now() - startTime;
+                const angle = elapsed * speed;
+                ctx.clearRect(0, 0, W, H);
+                drawScene(angle);
+                requestAnimationFrame(animate);
+            }
+            animate();
         }
-        ctx.shadowBlur = 0;
-
-        // 2. 地球
-        const cx = W/2, cy = H/2;
-        const radius = Math.min(W, H) * 0.38;
-        const earthGrad = ctx.createRadialGradient(cx - radius*0.25, cy - radius*0.25, 0, cx, cy, radius);
-        earthGrad.addColorStop(0, '#80deea');
-        earthGrad.addColorStop(0.4, '#4dd0e1');
-        earthGrad.addColorStop(0.7, '#0288d1');
-        earthGrad.addColorStop(1, '#01579b');
-        ctx.beginPath();
-        ctx.arc(cx, cy, radius, 0, Math.PI*2);
-        ctx.fillStyle = earthGrad;
-        ctx.shadowColor = 'rgba(100,200,255,0.5)';
-        ctx.shadowBlur = 50;
-        ctx.fill();
-        ctx.shadowBlur = 0;
-
-        // 大陆（椭圆）
-        const continents = [
-            { x: 0.30, y: 0.25, rx: 0.18, ry: 0.12, rot: 0.2 },
-            { x: 0.50, y: 0.22, rx: 0.15, ry: 0.10, rot: -0.1 },
-            { x: 0.65, y: 0.30, rx: 0.12, ry: 0.08, rot: 0.4 },
-            { x: 0.40, y: 0.48, rx: 0.20, ry: 0.15, rot: 0.0 },
-            { x: 0.60, y: 0.55, rx: 0.14, ry: 0.10, rot: -0.2 },
-            { x: 0.25, y: 0.60, rx: 0.16, ry: 0.12, rot: 0.3 },
-            { x: 0.48, y: 0.72, rx: 0.12, ry: 0.08, rot: 0.0 },
-            { x: 0.70, y: 0.68, rx: 0.10, ry: 0.06, rot: -0.3 }
-        ];
-        continents.forEach(c => {
-            const x = cx + (c.x - 0.5) * radius * 1.8;
-            const y = cy + (c.y - 0.5) * radius * 1.8;
-            const rx = c.rx * radius * 0.9;
-            const ry = c.ry * radius * 0.9;
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate(c.rot);
-            ctx.beginPath();
-            ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI*2);
-            ctx.fillStyle = 'rgba(76, 175, 80, 0.7)';
-            ctx.shadowColor = 'rgba(76,175,80,0.3)';
-            ctx.shadowBlur = 15;
-            ctx.fill();
-            ctx.restore();
-        });
-        ctx.shadowBlur = 0;
-
-        // 光环轨道
-        const orbitRadius = radius * 0.88;
-        ctx.beginPath();
-        ctx.arc(cx, cy, orbitRadius, 0, Math.PI*2);
-        ctx.strokeStyle = 'rgba(255,215,0,0.25)';
-        ctx.lineWidth = 1.5;
-        ctx.setLineDash([6, 8]);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        // 3. 两个小人（动态角度）
-        const people = ['👦', '👧'];
-        const colors = ['#ff6b9d', '#ffd700'];
-        people.forEach((emoji, i) => {
-            const a = angle + i * Math.PI; // 相对180度
-            const x = cx + Math.cos(a) * orbitRadius;
-            const y = cy + Math.sin(a) * orbitRadius;
-            // 光晕
-            const glow = ctx.createRadialGradient(x, y, 0, x, y, 28);
-            glow.addColorStop(0, colors[i] + 'bb');
-            glow.addColorStop(1, 'transparent');
-            ctx.fillStyle = glow;
-            ctx.beginPath();
-            ctx.arc(x, y, 28, 0, Math.PI*2);
-            ctx.fill();
-            // 小人
-            ctx.font = '38px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.shadowColor = colors[i];
-            ctx.shadowBlur = 25;
-            ctx.fillText(emoji, x, y);
-            ctx.shadowBlur = 0;
-        });
-
-        // 底部文字
-        ctx.font = 'bold 16px "PingFang SC", "Microsoft YaHei", sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'bottom';
-        ctx.shadowColor = 'rgba(255,215,0,0.6)';
-        ctx.shadowBlur = 15;
-        ctx.fillStyle = 'rgba(255,255,255,0.8)';
-        ctx.fillText('❤️ 我们一起走遍世界 ❤️', cx, H - 18);
-        ctx.shadowBlur = 0;
-    }
-
-    // ---- 动画循环 ----
-    let startTime = Date.now();
-    const speed = 0.0012; // 弧度/毫秒
-
-    function animate() {
-        const elapsed = Date.now() - startTime;
-        const angle = elapsed * speed;
-        // 清空画布
-        ctx.clearRect(0, 0, W, H);
-        // 绘制当前帧
-        drawScene(angle);
-        requestAnimationFrame(animate);
-    }
-
-    // 启动动画
-    animate();
-}
 
         // ==================== 音乐播放 ====================
         function updateVinylPlayer(){ const player=document.getElementById('vinylPlayer'); const name=document.getElementById('currentSongName'); if(musicPlaying&&musicList.length>0){ player.classList.add('playing'); const title=config.musicTitles?config.musicTitles[currentSongIndex]:'未知歌曲'; name.textContent=title||'未知歌曲'; }else{ player.classList.remove('playing'); name.textContent=musicPlaying?'播放中...':'未播放'; } const vis=document.getElementById('visualizer'); vis.style.display=musicPlaying?'flex':'none'; }
@@ -810,7 +825,6 @@
             typeLoginTitle();
             updateVinylPlayer();
             renderGifts();
-            // 如果首页已激活，直接绘制地图
             if(document.getElementById('page-home').classList.contains('active')){
                 setTimeout(() => { initTravelMap(); }, 500);
             }
