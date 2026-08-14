@@ -3,14 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <!-- 添加 referrer 策略，解决地图 403 问题 -->
-    <meta name="referrer" content="no-referrer" />
     <title>生日快乐，我的宝贝</title>
-    <!-- 使用国内 CDN 加速 -->
     <script src="https://cdn.bootcdn.net/ajax/libs/canvas-confetti/1.6.0/confetti.browser.min.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
     <style>
-        /* ===== 全局样式 ===== */
+        /* ===== 完整样式 ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --bg-dark: #1a1a2e;
@@ -62,7 +59,7 @@
         }
         .container { max-width: 600px; width: 100%; text-align: center; position: relative; z-index: 2; }
 
-        /* ===== 首页布局（地图在右侧） ===== */
+        /* 首页布局（地图在右侧） */
         .home-layout {
             display: flex;
             flex-wrap: wrap;
@@ -133,7 +130,7 @@
             .home-layout .home-map-wrapper { padding: 14px; }
         }
 
-        /* ===== 其余样式（与之前一致） ===== */
+        /* 其余样式（与之前一致） */
         h1 { font-size: 2.8rem; margin-bottom: 20px; text-shadow: 0 0 25px rgba(255,105,157,0.9); animation: float 3s ease-in-out infinite; color: var(--pink-light); }
         h2 { font-size: 1.9rem; margin-bottom: 15px; color: var(--pink-light); }
         p { font-size: 1.1rem; line-height: 1.8; margin-bottom: 15px; color: var(--text-secondary); }
@@ -301,7 +298,6 @@
     </style>
 </head>
 <body>
-    <!-- 页面结构（与之前相同，完整包含所有页面） -->
     <div class="stars" id="starsContainer"></div>
     <div class="music-btn" id="musicBtn" title="播放音乐/切换歌曲"><div class="btn-record"></div></div>
     <div class="visualizer" id="visualizer"><span class="note">🎵</span><span class="note">🎶</span><span class="note">🎵</span><span class="note">🎶</span><span class="note">🎵</span></div>
@@ -378,7 +374,6 @@
     <div class="modal" id="secondQuestionModal"><div class="modal-content"><h2>💭 最后一个问题</h2><p style="font-size:1.1rem; color:#fff;">此时此刻你想我吗？</p><div class="second-question-buttons"><button class="btn" onclick="answerSecondQuestion('想')">想</button><button class="btn btn-secondary" onclick="answerSecondQuestion('不想')">不想</button></div><div id="secondQuestionResult"></div><button class="btn close-btn" onclick="closeSecondQuestion()">关闭</button></div></div>
     <div class="modal" id="gameModal"><div class="modal-content"><h2 style="font-size:1.6rem; margin-bottom:20px;">做我永远的宝贝吗？</h2><button class="btn" id="agreeBtn" onclick="agreeForever()">💖 同意</button><button class="btn btn-secondary" id="rejectBtn" onmouseenter="moveRejectButton()" ontouchstart="moveRejectButton()" onclick="moveRejectButton()">😅 拒绝</button></div></div>
     <audio id="bgMusic"></audio>
-
     <script>
         // ==================== 配置 ====================
         const config = {
@@ -442,7 +437,7 @@
                 { emoji: "💋", text: "亲亲券" },
                 { emoji: "🎬", text: "电影券" },
                 { emoji: "🌹", text: "鲜花券" },
-                { emoji: "🩹", text: "和好券" }  // 替换为 emoji
+                { emoji: "🩹", text: "和好券" }
             ],
             stats: [
                 { number: 965, label: "在一起的天数" }, { number: "9999+", label: "一起拍过的照片" },
@@ -593,45 +588,25 @@
         function toggleFutureItem(index,element){ element.classList.toggle('checked'); const icon=element.querySelector('.check-icon'); icon.textContent=element.classList.contains('checked')?'✅':'◻️'; const allItems=document.querySelectorAll('.future-item'); const allChecked=Array.from(allItems).every(item=>item.classList.contains('checked')); document.getElementById('futureCompleteMessage').style.display=allChecked?'block':'none'; }
         function renderSideScrollPhotos(){ const left=document.getElementById('sideScrollLeft'),right=document.getElementById('sideScrollRight'); if(!left||!right)return; let photos=config.sidePhotos||[]; if(photos.length===0){ const placeholders=['#ff6b9d','#ffd700','#667eea','#4caf50','#ff8e8e','#ffb6c1','#ffa07a']; for(let i=0;i<15;i++) photos.push(placeholders[i%placeholders.length]); } const half=Math.floor(photos.length/2); const leftPhotos=photos.slice(0,half),rightPhotos=photos.slice(half); left.innerHTML=''; right.innerHTML=''; function createTrack(photos){ const track=document.createElement('div'); track.className='side-scroll-track'; for(let repeat=0;repeat<2;repeat++){ photos.forEach(src=>{ const img=document.createElement('img'); img.src=src; img.alt="回忆"; img.className='side-scroll-img'; img.onerror=function(){ const ph=document.createElement('div'); ph.className='side-scroll-placeholder'; if(src.startsWith('#')){ ph.style.background=src; ph.textContent='📷'; }else{ ph.style.background='#555'; ph.textContent='📷'; } this.parentNode.replaceChild(ph,this); }; track.appendChild(img); }); } return track; } left.appendChild(createTrack(leftPhotos)); right.appendChild(createTrack(rightPhotos)); }
 
-        // ==================== 问卷（已修复） ====================
+        // ==================== 问卷（改用邮件） ====================
         function openSurvey(){ const container=document.getElementById('surveyQuestions'); container.innerHTML=''; config.surveyQuestions.forEach((q,index)=>{ const div=document.createElement('div'); div.className='question-item'; div.innerHTML=`<label>${index+1}. ${q}</label><textarea id="surveyAns${index}" rows="2"></textarea>`; container.appendChild(div); }); document.getElementById('surveyModal').classList.add('active'); }
         function closeSurvey(){ document.getElementById('surveyModal').classList.remove('active'); }
         function submitSurvey(){
+            // 验证是否所有问题都已填写
             for(let i=0;i<config.surveyQuestions.length;i++){ const ans=document.getElementById(`surveyAns${i}`); if(!ans||ans.value.trim()===''){ alert('请回答所有问题后再提交哦～'); return; } }
-            const answers={}; for(let i=0;i<config.surveyQuestions.length;i++){ const ans=document.getElementById(`surveyAns${i}`).value.trim(); answers[config.surveyQuestions[i]]=ans; }
-            const choices=window.selectedChoices||{};
-            const data={ answers, choices };
-
-            const SUPABASE_URL = 'https://hfqhkiouvtyxwcorutb.supabase.co';
-            const SUPABASE_ANON_KEY = 'sb_publishable_o2a_0XwT9a8RPLGf39wjXg_8wQqTkvE';
-
-            fetch(SUPABASE_URL + '/rest/v1/surveys', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
-                },
-                body: JSON.stringify(data)
-            })
-            .then(async res => {
-                if (!res.ok) {
-                    const errText = await res.text();
-                    throw new Error(`HTTP ${res.status}: ${errText}`);
-                }
-                return res.json();
-            })
-            .then(result => {
-                alert('✅ 问卷提交成功！谢谢你 💖');
-                closeSurvey();
-                document.getElementById('secondQuestionModal').classList.add('active');
-                document.getElementById('secondQuestionResult').style.display = 'none';
-                surveyCompleted = true;
-            })
-            .catch(err => {
-                console.error('提交错误:', err);
-                alert('❌ 提交失败，错误详情：' + err.message + '\n请查看控制台（F12）获取完整信息。');
-            });
+            // 收集答案并拼接成邮件正文
+            let body='问卷提交时间：'+new Date().toLocaleString()+'\n\n';
+            for(let i=0;i<config.surveyQuestions.length;i++){ const ans=document.getElementById(`surveyAns${i}`).value.trim(); body+=(i+1)+'. '+config.surveyQuestions[i]+'\n回答：'+ans+'\n\n'; }
+            // 构造 mailto 链接
+            const subject=encodeURIComponent('生日问卷答案');
+            const mailtoLink='mailto:2898334402@qq.com?subject='+subject+'&body='+encodeURIComponent(body);
+            // 打开默认邮件客户端
+            window.location.href=mailtoLink;
+            // 关闭弹窗并显示后续
+            closeSurvey();
+            document.getElementById('secondQuestionModal').classList.add('active');
+            document.getElementById('secondQuestionResult').style.display='none';
+            surveyCompleted=true;
         }
         function answerSecondQuestion(choice){ const resultDiv=document.getElementById('secondQuestionResult'); resultDiv.style.display='block'; if(choice==='想'){ resultDiv.innerHTML='💖 我也很想你，联系我吧 💖'; }else{ resultDiv.innerHTML='🌙 没关系，我一直在想你 🌙'; } document.querySelectorAll('#secondQuestionModal .second-question-buttons .btn').forEach(btn=>btn.disabled=true); resultDiv.scrollIntoView({behavior:'smooth',block:'center'}); }
         function closeSecondQuestion(){ document.getElementById('secondQuestionModal').classList.remove('active'); }
@@ -648,16 +623,13 @@
             const container = document.getElementById('travelMap');
             if (!container) return;
             if (mapChart) { mapChart.dispose(); mapChart = null; }
-
             const loading = document.getElementById('mapLoading');
             if (loading) loading.style.display = 'flex';
             if (typeof echarts === 'undefined') {
                 if (loading) loading.innerHTML = '<span style="color:#ff8a8a;">地图库加载失败，请刷新重试</span>';
                 return;
             }
-
             mapChart = echarts.init(container);
-
             // 尝试从 localStorage 读取缓存
             const cachedGeo = localStorage.getItem('china_geo');
             if (cachedGeo) {
@@ -671,13 +643,11 @@
                     return;
                 } catch (e) { console.warn('缓存数据无效，重新加载'); }
             }
-
             // 无缓存，请求数据
             const geoUrl = 'https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json';
             fetch(geoUrl, { mode: 'cors' })
                 .then(res => { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
                 .then(data => {
-                    // 存入缓存
                     try { localStorage.setItem('china_geo', JSON.stringify(data)); } catch (e) {}
                     echarts.registerMap('china', data);
                     mapDataLoaded = true;
