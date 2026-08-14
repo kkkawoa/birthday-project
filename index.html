@@ -58,7 +58,7 @@
         }
         .container { max-width: 600px; width: 100%; text-align: center; position: relative; z-index: 2; }
 
-        /* 首页布局 */
+        /* 首页布局（地图在右侧） */
         .home-layout {
             display: flex;
             flex-wrap: wrap;
@@ -358,7 +358,6 @@
     <div class="modal" id="secondQuestionModal"><div class="modal-content"><h2>💭 最后一个问题</h2><p style="font-size:1.1rem; color:#fff;">此时此刻你想我吗？</p><div class="second-question-buttons"><button class="btn" onclick="answerSecondQuestion('想')">想</button><button class="btn btn-secondary" onclick="answerSecondQuestion('不想')">不想</button></div><div id="secondQuestionResult"></div><button class="btn close-btn" onclick="closeSecondQuestion()">关闭</button></div></div>
     <div class="modal" id="gameModal"><div class="modal-content"><h2 style="font-size:1.6rem; margin-bottom:20px;">做我永远的宝贝吗？</h2><button class="btn" id="agreeBtn" onclick="agreeForever()">💖 同意</button><button class="btn btn-secondary" id="rejectBtn" onmouseenter="moveRejectButton()" ontouchstart="moveRejectButton()" onclick="moveRejectButton()">😅 拒绝</button></div></div>
     <audio id="bgMusic"></audio>
-
     <script>
         // ==================== 配置 ====================
         const config = {
@@ -510,7 +509,7 @@
         // ==================== 盲盒 ====================
         function renderGifts(){ const g=document.getElementById('giftGrid'); if(!g)return; g.innerHTML=''; config.gifts.forEach((gift,index)=>{ const box=document.createElement('div'); box.className='gift-box closed'; box.innerHTML=`<div class="gift-icon">🎁</div><div class="gift-hint">点击拆开</div><div class="gift-content"><img src="${gift.img}" alt="${gift.name}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22120%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23333%22/><text x=%2250%25%22 y=%2250%25%22 fill=%22%23fff%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2212%22>礼物图片</text></svg>'"><div class="gift-name">${gift.name}</div></div>`; box.addEventListener('click',function(){ if(this.classList.contains('closed')){ this.classList.remove('closed'); this.classList.add('opened'); launchConfetti(); } }); g.appendChild(box); }); }
 
-        // ==================== 时间线（视频预加载 metadata） ====================
+        // ==================== 时间线 ====================
         function renderPhotos(){
             const grid=document.getElementById('photoGrid');
             grid.innerHTML='';
@@ -607,142 +606,135 @@
         function agreeForever(){ document.getElementById('gameModal').classList.remove('active'); createHeartExplosion(); if(typeof confetti!=='undefined'){ confetti({particleCount:200,spread:100,origin:{y:0.6},colors:['#ff6b9d','#ffd700','#ff8e8e','#ffffff']}); } setTimeout(()=>{ showPage('page-final'); },1200); }
         function createHeartExplosion(){ const container=document.body; const hearts=['❤️','💖','💕','💗','💘','💝']; for(let i=0;i<80;i++){ const heart=document.createElement('div'); heart.textContent=hearts[Math.floor(Math.random()*hearts.length)]; heart.style.cssText=`position:fixed;top:50%;left:50%;font-size:${Math.random()*30+20}px;z-index:1000;pointer-events:none;animation:heartBurst ${1.5+Math.random()*2}s ease-out forwards;`; const angle=Math.random()*Math.PI*2; const distance=100+Math.random()*300; const dx=Math.cos(angle)*distance; const dy=Math.sin(angle)*distance; heart.style.setProperty('--dx',dx+'px'); heart.style.setProperty('--dy',dy+'px'); container.appendChild(heart); setTimeout(()=>heart.remove(),3500); } }
 
-        // ==================== 地图（卡通 Canvas） ====================
-     function initTravelMap() {
-    const canvas = document.getElementById('travelMap');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const W = canvas.width, H = canvas.height;
+        // ==================== 地图（两个小人绕地球走） ====================
+        function initTravelMap() {
+            const canvas = document.getElementById('travelMap');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width, H = canvas.height;
 
-    // ----- 1. 画地球（蓝色渐变圆） -----
-    const centerX = W / 2;
-    const centerY = H / 2;
-    const radius = Math.min(W, H) * 0.38;
+            // 背景（星空）
+            const bgGrad = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.min(W,H)*0.6);
+            bgGrad.addColorStop(0, '#0a0e27');
+            bgGrad.addColorStop(1, '#1a2a4a');
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, W, H);
 
-    // 背景渐变（星空）
-    const bgGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius * 1.2);
-    bgGrad.addColorStop(0, '#0a0e27');
-    bgGrad.addColorStop(1, '#1a2a4a');
-    ctx.fillStyle = bgGrad;
-    ctx.fillRect(0, 0, W, H);
-
-    // 地球本体（蓝色渐变）
-    const earthGrad = ctx.createRadialGradient(centerX - radius*0.2, centerY - radius*0.2, 0, centerX, centerY, radius);
-    earthGrad.addColorStop(0, '#4fc3f7');
-    earthGrad.addColorStop(0.6, '#0288d1');
-    earthGrad.addColorStop(1, '#01579b');
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    ctx.fillStyle = earthGrad;
-    ctx.fill();
-    // 地球光晕
-    ctx.shadowColor = 'rgba(100, 200, 255, 0.3)';
-    ctx.shadowBlur = 40;
-    ctx.fill();
-    ctx.shadowBlur = 0;
-
-    // 大陆简化（几个绿色斑点）
-    const continents = [
-        [0.35, 0.30, 0.25], [0.55, 0.25, 0.20], [0.70, 0.35, 0.15],
-        [0.45, 0.50, 0.30], [0.65, 0.55, 0.20], [0.30, 0.60, 0.25],
-        [0.50, 0.70, 0.20], [0.75, 0.70, 0.15]
-    ];
-    continents.forEach(([dx, dy, size]) => {
-        const x = centerX + (dx - 0.5) * radius * 1.6;
-        const y = centerY + (dy - 0.5) * radius * 1.6;
-        const r = size * radius * 0.25;
-        ctx.beginPath();
-        ctx.arc(x, y, r, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(76, 175, 80, 0.7)';
-        ctx.shadowColor = 'rgba(76, 175, 80, 0.3)';
-        ctx.shadowBlur = 12;
-        ctx.fill();
-    });
-    ctx.shadowBlur = 0;
-
-    // ----- 2. 两个小人沿圆周行走 -----
-    const people = [
-        { emoji: '👦', angle: 0 },
-        { emoji: '👧', angle: Math.PI }  // 相对方向
-    ];
-    const orbitRadius = radius * 0.85;
-    let startTime = Date.now();
-
-    function animate() {
-        const elapsed = Date.now() - startTime;
-        const speed = 0.0012; // 弧度/毫秒
-        const currentAngle = elapsed * speed;
-
-        // 清空画布，重绘背景和地球（为了简单，重新绘制全部）
-        // 但为了性能，我们只清除一部分，但这里重绘全部，因为绘制简单
-        ctx.clearRect(0, 0, W, H);
-
-        // 重绘背景
-        const bgGrad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius * 1.2);
-        bgGrad.addColorStop(0, '#0a0e27');
-        bgGrad.addColorStop(1, '#1a2a4a');
-        ctx.fillStyle = bgGrad;
-        ctx.fillRect(0, 0, W, H);
-
-        // 地球
-        const earthGrad = ctx.createRadialGradient(centerX - radius*0.2, centerY - radius*0.2, 0, centerX, centerY, radius);
-        earthGrad.addColorStop(0, '#4fc3f7');
-        earthGrad.addColorStop(0.6, '#0288d1');
-        earthGrad.addColorStop(1, '#01579b');
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-        ctx.fillStyle = earthGrad;
-        ctx.fill();
-        ctx.shadowColor = 'rgba(100, 200, 255, 0.3)';
-        ctx.shadowBlur = 40;
-        ctx.fill();
-        ctx.shadowBlur = 0;
-
-        // 大陆
-        continents.forEach(([dx, dy, size]) => {
-            const x = centerX + (dx - 0.5) * radius * 1.6;
-            const y = centerY + (dy - 0.5) * radius * 1.6;
-            const r = size * radius * 0.25;
+            // 地球
+            const cx = W/2, cy = H/2;
+            const radius = Math.min(W, H) * 0.38;
+            const earthGrad = ctx.createRadialGradient(cx - radius*0.2, cy - radius*0.2, 0, cx, cy, radius);
+            earthGrad.addColorStop(0, '#4fc3f7');
+            earthGrad.addColorStop(0.6, '#0288d1');
+            earthGrad.addColorStop(1, '#01579b');
             ctx.beginPath();
-            ctx.arc(x, y, r, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(76, 175, 80, 0.7)';
-            ctx.shadowColor = 'rgba(76, 175, 80, 0.3)';
-            ctx.shadowBlur = 12;
+            ctx.arc(cx, cy, radius, 0, Math.PI*2);
+            ctx.fillStyle = earthGrad;
+            ctx.shadowColor = 'rgba(100,200,255,0.3)';
+            ctx.shadowBlur = 40;
             ctx.fill();
-        });
-        ctx.shadowBlur = 0;
+            ctx.shadowBlur = 0;
 
-        // 画两个小人
-        people.forEach((person, idx) => {
-            const angle = person.angle + currentAngle;
-            const x = centerX + Math.cos(angle) * orbitRadius;
-            const y = centerY + Math.sin(angle) * orbitRadius;
-            // 小人的光晕
-            const glow = ctx.createRadialGradient(x, y, 0, x, y, 20);
-            glow.addColorStop(0, 'rgba(255,215,0,0.5)');
-            glow.addColorStop(1, 'rgba(255,215,0,0)');
-            ctx.fillStyle = glow;
-            ctx.beginPath();
-            ctx.arc(x, y, 20, 0, Math.PI*2);
-            ctx.fill();
-            // 小人 emoji
-            ctx.font = '36px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(person.emoji, x, y);
-        });
+            // 大陆斑点（简化）
+            const continents = [
+                [0.35, 0.30, 0.25], [0.55, 0.25, 0.20], [0.70, 0.35, 0.15],
+                [0.45, 0.50, 0.30], [0.65, 0.55, 0.20], [0.30, 0.60, 0.25],
+                [0.50, 0.70, 0.20], [0.75, 0.70, 0.15]
+            ];
+            continents.forEach(([dx, dy, size]) => {
+                const x = cx + (dx - 0.5) * radius * 1.6;
+                const y = cy + (dy - 0.5) * radius * 1.6;
+                const r = size * radius * 0.25;
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI*2);
+                ctx.fillStyle = 'rgba(76, 175, 80, 0.7)';
+                ctx.shadowColor = 'rgba(76,175,80,0.3)';
+                ctx.shadowBlur = 12;
+                ctx.fill();
+            });
+            ctx.shadowBlur = 0;
 
-        // 加一点文字提示（可选）
-        ctx.font = '14px sans-serif';
-        ctx.fillStyle = 'rgba(255,255,255,0.5)';
-        ctx.textAlign = 'center';
-        ctx.fillText('❤️ 我们一起走遍世界 ❤️', centerX, H - 25);
+            // 两个小人
+            const people = [
+                { emoji: '👦', angle: 0 },
+                { emoji: '👧', angle: Math.PI }
+            ];
+            const orbitRadius = radius * 0.85;
+            let startTime = Date.now();
 
-        requestAnimationFrame(animate);
-    }
+            function animate() {
+                const elapsed = Date.now() - startTime;
+                const speed = 0.0012;
+                const currentAngle = elapsed * speed;
 
-    animate();
-}
+                // 清空并重绘
+                ctx.clearRect(0, 0, W, H);
+
+                // 背景
+                const bgGrad2 = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.min(W,H)*0.6);
+                bgGrad2.addColorStop(0, '#0a0e27');
+                bgGrad2.addColorStop(1, '#1a2a4a');
+                ctx.fillStyle = bgGrad2;
+                ctx.fillRect(0, 0, W, H);
+
+                // 地球
+                const earthGrad2 = ctx.createRadialGradient(cx - radius*0.2, cy - radius*0.2, 0, cx, cy, radius);
+                earthGrad2.addColorStop(0, '#4fc3f7');
+                earthGrad2.addColorStop(0.6, '#0288d1');
+                earthGrad2.addColorStop(1, '#01579b');
+                ctx.beginPath();
+                ctx.arc(cx, cy, radius, 0, Math.PI*2);
+                ctx.fillStyle = earthGrad2;
+                ctx.shadowColor = 'rgba(100,200,255,0.3)';
+                ctx.shadowBlur = 40;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                // 大陆
+                continents.forEach(([dx, dy, size]) => {
+                    const x = cx + (dx - 0.5) * radius * 1.6;
+                    const y = cy + (dy - 0.5) * radius * 1.6;
+                    const r = size * radius * 0.25;
+                    ctx.beginPath();
+                    ctx.arc(x, y, r, 0, Math.PI*2);
+                    ctx.fillStyle = 'rgba(76, 175, 80, 0.7)';
+                    ctx.shadowColor = 'rgba(76,175,80,0.3)';
+                    ctx.shadowBlur = 12;
+                    ctx.fill();
+                });
+                ctx.shadowBlur = 0;
+
+                // 画两个小人
+                people.forEach((person) => {
+                    const angle = person.angle + currentAngle;
+                    const x = cx + Math.cos(angle) * orbitRadius;
+                    const y = cy + Math.sin(angle) * orbitRadius;
+                    // 光晕
+                    const glow = ctx.createRadialGradient(x, y, 0, x, y, 20);
+                    glow.addColorStop(0, 'rgba(255,215,0,0.5)');
+                    glow.addColorStop(1, 'rgba(255,215,0,0)');
+                    ctx.fillStyle = glow;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 20, 0, Math.PI*2);
+                    ctx.fill();
+                    // 小人
+                    ctx.font = '36px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(person.emoji, x, y);
+                });
+
+                // 文字
+                ctx.font = '14px sans-serif';
+                ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                ctx.textAlign = 'center';
+                ctx.fillText('❤️ 我们一起走遍世界 ❤️', cx, H - 25);
+
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
         // ==================== 音乐播放 ====================
         function updateVinylPlayer(){ const player=document.getElementById('vinylPlayer'); const name=document.getElementById('currentSongName'); if(musicPlaying&&musicList.length>0){ player.classList.add('playing'); const title=config.musicTitles?config.musicTitles[currentSongIndex]:'未知歌曲'; name.textContent=title||'未知歌曲'; }else{ player.classList.remove('playing'); name.textContent=musicPlaying?'播放中...':'未播放'; } const vis=document.getElementById('visualizer'); vis.style.display=musicPlaying?'flex':'none'; }
         function applyBackground(){ const bg=config.musicBackgrounds&&config.musicBackgrounds[currentSongIndex]; document.body.style.background=bg&&bg!==''?bg:"linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%)"; }
@@ -778,7 +770,6 @@
             typeLoginTitle();
             updateVinylPlayer();
             renderGifts();
-            // 延迟加载地图
             setTimeout(() => {
                 if (document.getElementById('page-home').classList.contains('active')) {
                     initTravelMap();
