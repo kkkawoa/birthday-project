@@ -7,7 +7,6 @@
     <title>生日快乐，我的宝贝</title>
     <script src="https://cdn.bootcdn.net/ajax/libs/canvas-confetti/1.6.0/confetti.browser.min.js"></script>
     <style>
-        /* ===== 全局样式 ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --bg-dark: #1a1a2e;
@@ -59,7 +58,7 @@
         }
         .container { max-width: 600px; width: 100%; text-align: center; position: relative; z-index: 2; }
 
-        /* 首页布局（地图在右侧） */
+        /* 首页布局 */
         .home-layout {
             display: flex;
             flex-wrap: wrap;
@@ -115,7 +114,7 @@
             .home-layout .home-map-wrapper { padding: 14px; }
         }
 
-        /* 其余样式 */
+        /* 其余样式（与之前完全一致） */
         h1 { font-size: 2.8rem; margin-bottom: 20px; text-shadow: 0 0 25px rgba(255,105,157,0.9); animation: float 3s ease-in-out infinite; color: var(--pink-light); }
         h2 { font-size: 1.9rem; margin-bottom: 15px; color: var(--pink-light); }
         p { font-size: 1.1rem; line-height: 1.8; margin-bottom: 15px; color: var(--text-secondary); }
@@ -280,7 +279,6 @@
         .side-scroll-img { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; margin: 5px auto; border: 2px solid rgba(255,255,255,0.3); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .side-scroll-placeholder { width: 80px; height: 80px; border-radius: 12px; margin: 5px auto; border: 2px solid rgba(255,255,255,0.3); background: #555; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #fff; }
         @keyframes scrollVertical { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
-        /* 样式结束 */
     </style>
 </head>
 <body>
@@ -360,6 +358,7 @@
     <div class="modal" id="secondQuestionModal"><div class="modal-content"><h2>💭 最后一个问题</h2><p style="font-size:1.1rem; color:#fff;">此时此刻你想我吗？</p><div class="second-question-buttons"><button class="btn" onclick="answerSecondQuestion('想')">想</button><button class="btn btn-secondary" onclick="answerSecondQuestion('不想')">不想</button></div><div id="secondQuestionResult"></div><button class="btn close-btn" onclick="closeSecondQuestion()">关闭</button></div></div>
     <div class="modal" id="gameModal"><div class="modal-content"><h2 style="font-size:1.6rem; margin-bottom:20px;">做我永远的宝贝吗？</h2><button class="btn" id="agreeBtn" onclick="agreeForever()">💖 同意</button><button class="btn btn-secondary" id="rejectBtn" onmouseenter="moveRejectButton()" ontouchstart="moveRejectButton()" onclick="moveRejectButton()">😅 拒绝</button></div></div>
     <audio id="bgMusic"></audio>
+
     <script>
         // ==================== 配置 ====================
         const config = {
@@ -403,7 +402,6 @@
                 { src: "16.jpg", caption: "记录第一次全款拿下喜欢的包包", backText: "独立女人最有魅力" },
                 { src: "17.jpg", caption: "总是喜欢趁我睡觉偷拍", backText: "什么样的我你也觉得好看" },
                 { src: "18.jpg", caption: "女司机第一次上路", backText: "坐你的车我放心" },
-                // 视频预加载改为 metadata
                 { src: "video1.mp4", caption: "俩个懒人的较真", type: "video", backText: "实际上我都做了", preload: "metadata" },
                 { src: "video2.mp4", caption: "我在这儿等着你回来", type: "video", backText: "等你，永远不嫌久", preload: "metadata" },
                 { src: "video3.mp4", caption: "工作状态不敢打扰她", type: "video", backText: "认真的你最有魅力", preload: "metadata" },
@@ -521,7 +519,7 @@
                 card.className='flip-card';
                 card.id='memory-card-'+index;
                 if(photo.type==='video'){
-                    const preloadAttr = photo.preload || 'metadata'; // 默认 metadata
+                    const preloadAttr = photo.preload || 'metadata';
                     card.innerHTML=`<div class="flip-card-inner"><div class="flip-card-front"><video src="${photo.src}" preload="${preloadAttr}" muted playsinline style="width:100%;height:100%;object-fit:cover;"></video><div class="video-icon">▶️</div><div class="photo-caption">${photo.caption}</div></div><div class="flip-card-back"><div class="back-text">${photo.backText||'这一刻，我永远记得 ❤️'}</div><button class="back-btn" onclick="event.stopPropagation(); openVideoModal(config.photos[${index}])">播放视频</button></div></div>`;
                 }else{
                     card.innerHTML=`<div class="flip-card-inner"><div class="flip-card-front"><img src="${photo.src}" alt="回忆" loading="lazy" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22500%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23333%22/><text x=%2250%25%22 y=%2250%25%22 fill=%22%23fff%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2220%22>回忆</text></svg>'"><div class="photo-caption">${photo.caption}</div></div><div class="flip-card-back"><div class="back-text">${photo.backText||'这一刻，我永远记得 ❤️'}</div><button class="back-btn" onclick="event.stopPropagation(); openPhotoModal(config.photos[${index}])">查看大图</button></div></div>`;
@@ -567,7 +565,7 @@
         function toggleFutureItem(index,element){ element.classList.toggle('checked'); const icon=element.querySelector('.check-icon'); icon.textContent=element.classList.contains('checked')?'✅':'◻️'; const allItems=document.querySelectorAll('.future-item'); const allChecked=Array.from(allItems).every(item=>item.classList.contains('checked')); document.getElementById('futureCompleteMessage').style.display=allChecked?'block':'none'; }
         function renderSideScrollPhotos(){ const left=document.getElementById('sideScrollLeft'),right=document.getElementById('sideScrollRight'); if(!left||!right)return; let photos=config.sidePhotos||[]; if(photos.length===0){ const placeholders=['#ff6b9d','#ffd700','#667eea','#4caf50','#ff8e8e','#ffb6c1','#ffa07a']; for(let i=0;i<15;i++) photos.push(placeholders[i%placeholders.length]); } const half=Math.floor(photos.length/2); const leftPhotos=photos.slice(0,half),rightPhotos=photos.slice(half); left.innerHTML=''; right.innerHTML=''; function createTrack(photos){ const track=document.createElement('div'); track.className='side-scroll-track'; for(let repeat=0;repeat<2;repeat++){ photos.forEach(src=>{ const img=document.createElement('img'); img.src=src; img.alt="回忆"; img.className='side-scroll-img'; img.onerror=function(){ const ph=document.createElement('div'); ph.className='side-scroll-placeholder'; if(src.startsWith('#')){ ph.style.background=src; ph.textContent='📷'; }else{ ph.style.background='#555'; ph.textContent='📷'; } this.parentNode.replaceChild(ph,this); }; track.appendChild(img); }); } return track; } left.appendChild(createTrack(leftPhotos)); right.appendChild(createTrack(rightPhotos)); }
 
-        // ==================== 问卷（使用 formsubmit.co） ====================
+        // ==================== 问卷 ====================
         function openSurvey(){ const container=document.getElementById('surveyQuestions'); container.innerHTML=''; config.surveyQuestions.forEach((q,index)=>{ const div=document.createElement('div'); div.className='question-item'; div.innerHTML=`<label>${index+1}. ${q}</label><textarea id="surveyAns${index}" rows="2"></textarea>`; container.appendChild(div); }); document.getElementById('surveyModal').classList.add('active'); }
         function closeSurvey(){ document.getElementById('surveyModal').classList.remove('active'); }
         function submitSurvey(){
@@ -610,7 +608,7 @@
         function createHeartExplosion(){ const container=document.body; const hearts=['❤️','💖','💕','💗','💘','💝']; for(let i=0;i<80;i++){ const heart=document.createElement('div'); heart.textContent=hearts[Math.floor(Math.random()*hearts.length)]; heart.style.cssText=`position:fixed;top:50%;left:50%;font-size:${Math.random()*30+20}px;z-index:1000;pointer-events:none;animation:heartBurst ${1.5+Math.random()*2}s ease-out forwards;`; const angle=Math.random()*Math.PI*2; const distance=100+Math.random()*300; const dx=Math.cos(angle)*distance; const dy=Math.sin(angle)*distance; heart.style.setProperty('--dx',dx+'px'); heart.style.setProperty('--dy',dy+'px'); container.appendChild(heart); setTimeout(()=>heart.remove(),3500); } }
 
         // ==================== 地图（卡通 Canvas） ====================
-        function initTravelMap(){
+        function initTravelMap() {
             const canvas = document.getElementById('travelMap');
             if (!canvas) {
                 console.error('找不到 canvas 元素 #travelMap');
@@ -618,6 +616,7 @@
             }
             const ctx = canvas.getContext('2d');
             const W = canvas.width, H = canvas.height;
+
             // 简化中国轮廓点
             const points = [
                 [0.10,0.40],[0.14,0.36],[0.20,0.32],[0.28,0.30],[0.35,0.32],[0.42,0.28],
@@ -637,74 +636,74 @@
             const cityOrder = ['太原','西安','长沙','三亚','万宁','北京'];
 
             // 绘制静态部分
-            function drawStatic() {
-                ctx.clearRect(0, 0, W, H);
-                const grad = ctx.createLinearGradient(0,0,W,H);
-                grad.addColorStop(0, 'rgba(255, 215, 0, 0.15)');
-                grad.addColorStop(1, 'rgba(255, 105, 180, 0.15)');
-                ctx.fillStyle = grad;
-                ctx.fillRect(0,0,W,H);
+            ctx.clearRect(0, 0, W, H);
+            const grad = ctx.createLinearGradient(0,0,W,H);
+            grad.addColorStop(0, 'rgba(255, 215, 0, 0.15)');
+            grad.addColorStop(1, 'rgba(255, 105, 180, 0.15)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0,0,W,H);
+            ctx.beginPath();
+            points.forEach((p, i) => {
+                const x = p[0] * W, y = p[1] * H;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(255, 182, 193, 0.5)';
+            ctx.fill();
+            ctx.strokeStyle = '#ff6b9d';
+            ctx.lineWidth = 3;
+            ctx.shadowColor = '#ff6b9d';
+            ctx.shadowBlur = 10;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            // 城市
+            cityOrder.forEach(name => {
+                const pos = cities[name];
+                const x = pos[0] * W, y = pos[1] * H;
+                const grad2 = ctx.createRadialGradient(x, y, 0, x, y, 18);
+                grad2.addColorStop(0, '#ffd700');
+                grad2.addColorStop(0.6, '#ff6b9d');
+                grad2.addColorStop(1, 'transparent');
+                ctx.fillStyle = grad2;
                 ctx.beginPath();
-                points.forEach((p, i) => {
-                    const x = p[0] * W, y = p[1] * H;
-                    if (i === 0) ctx.moveTo(x, y);
-                    else ctx.lineTo(x, y);
-                });
-                ctx.closePath();
-                ctx.fillStyle = 'rgba(255, 182, 193, 0.5)';
+                ctx.arc(x, y, 18, 0, Math.PI*2);
                 ctx.fill();
-                ctx.strokeStyle = '#ff6b9d';
-                ctx.lineWidth = 3;
-                ctx.shadowColor = '#ff6b9d';
-                ctx.shadowBlur = 10;
-                ctx.stroke();
-                ctx.shadowBlur = 0;
-                // 城市
-                cityOrder.forEach(name => {
-                    const pos = cities[name];
-                    const x = pos[0] * W, y = pos[1] * H;
-                    const grad2 = ctx.createRadialGradient(x, y, 0, x, y, 18);
-                    grad2.addColorStop(0, '#ffd700');
-                    grad2.addColorStop(0.6, '#ff6b9d');
-                    grad2.addColorStop(1, 'transparent');
-                    ctx.fillStyle = grad2;
-                    ctx.beginPath();
-                    ctx.arc(x, y, 18, 0, Math.PI*2);
-                    ctx.fill();
-                    ctx.beginPath();
-                    ctx.arc(x, y, 6, 0, Math.PI*2);
-                    ctx.fillStyle = '#fff';
-                    ctx.shadowColor = '#ff6b9d';
-                    ctx.shadowBlur = 12;
-                    ctx.fill();
-                    ctx.shadowBlur = 0;
-                    ctx.font = 'bold 12px sans-serif';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'bottom';
-                    ctx.fillStyle = '#fff';
-                    ctx.shadowColor = 'rgba(0,0,0,0.8)';
-                    ctx.shadowBlur = 6;
-                    ctx.fillText(name, x, y - 10);
-                    ctx.shadowBlur = 0;
-                });
-                // 航线
                 ctx.beginPath();
-                ctx.strokeStyle = 'rgba(255, 215, 0, 0.6)';
-                ctx.lineWidth = 2;
-                ctx.setLineDash([8, 6]);
-                for (let i = 0; i < cityOrder.length - 1; i++) {
-                    const from = cities[cityOrder[i]];
-                    const to = cities[cityOrder[i+1]];
-                    const x1 = from[0]*W, y1 = from[1]*H;
-                    const x2 = to[0]*W, y2 = to[1]*H;
-                    const cx = (x1 + x2)/2;
-                    const cy = (y1 + y2)/2 - 30;
-                    ctx.moveTo(x1, y1);
-                    ctx.quadraticCurveTo(cx, cy, x2, y2);
-                }
-                ctx.stroke();
-                ctx.setLineDash([]);
+                ctx.arc(x, y, 6, 0, Math.PI*2);
+                ctx.fillStyle = '#fff';
+                ctx.shadowColor = '#ff6b9d';
+                ctx.shadowBlur = 12;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.font = 'bold 12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillStyle = '#fff';
+                ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                ctx.shadowBlur = 6;
+                ctx.fillText(name, x, y - 10);
+                ctx.shadowBlur = 0;
+            });
+
+            // 航线
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(255, 215, 0, 0.6)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([8, 6]);
+            for (let i = 0; i < cityOrder.length - 1; i++) {
+                const from = cities[cityOrder[i]];
+                const to = cities[cityOrder[i+1]];
+                const x1 = from[0]*W, y1 = from[1]*H;
+                const x2 = to[0]*W, y2 = to[1]*H;
+                const cx = (x1 + x2)/2;
+                const cy = (y1 + y2)/2 - 30;
+                ctx.moveTo(x1, y1);
+                ctx.quadraticCurveTo(cx, cy, x2, y2);
             }
+            ctx.stroke();
+            ctx.setLineDash([]);
 
             // 飞机动画
             let startTime = Date.now();
@@ -727,8 +726,73 @@
                 const x = (1-u)*(1-u)*x1 + 2*(1-u)*u*cx + u*u*x2;
                 const y = (1-u)*(1-u)*y1 + 2*(1-u)*u*cy + u*u*y2;
 
-                drawStatic();
-                // 绘制飞机
+                // 重绘静态部分
+                ctx.clearRect(0, 0, W, H);
+                const gradBg = ctx.createLinearGradient(0,0,W,H);
+                gradBg.addColorStop(0, 'rgba(255, 215, 0, 0.15)');
+                gradBg.addColorStop(1, 'rgba(255, 105, 180, 0.15)');
+                ctx.fillStyle = gradBg;
+                ctx.fillRect(0,0,W,H);
+                ctx.beginPath();
+                points.forEach((p, i) => {
+                    const xp = p[0] * W, yp = p[1] * H;
+                    if (i === 0) ctx.moveTo(xp, yp);
+                    else ctx.lineTo(xp, yp);
+                });
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(255, 182, 193, 0.5)';
+                ctx.fill();
+                ctx.strokeStyle = '#ff6b9d';
+                ctx.lineWidth = 3;
+                ctx.shadowColor = '#ff6b9d';
+                ctx.shadowBlur = 10;
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+                cityOrder.forEach(name => {
+                    const pos = cities[name];
+                    const xp = pos[0] * W, yp = pos[1] * H;
+                    const grad2 = ctx.createRadialGradient(xp, yp, 0, xp, yp, 18);
+                    grad2.addColorStop(0, '#ffd700');
+                    grad2.addColorStop(0.6, '#ff6b9d');
+                    grad2.addColorStop(1, 'transparent');
+                    ctx.fillStyle = grad2;
+                    ctx.beginPath();
+                    ctx.arc(xp, yp, 18, 0, Math.PI*2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(xp, yp, 6, 0, Math.PI*2);
+                    ctx.fillStyle = '#fff';
+                    ctx.shadowColor = '#ff6b9d';
+                    ctx.shadowBlur = 12;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    ctx.font = 'bold 12px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    ctx.fillStyle = '#fff';
+                    ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                    ctx.shadowBlur = 6;
+                    ctx.fillText(name, xp, yp - 10);
+                    ctx.shadowBlur = 0;
+                });
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(255, 215, 0, 0.6)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([8, 6]);
+                for (let i = 0; i < cityOrder.length - 1; i++) {
+                    const from = cities[cityOrder[i]];
+                    const to = cities[cityOrder[i+1]];
+                    const x1 = from[0]*W, y1 = from[1]*H;
+                    const x2 = to[0]*W, y2 = to[1]*H;
+                    const cx = (x1 + x2)/2;
+                    const cy = (y1 + y2)/2 - 30;
+                    ctx.moveTo(x1, y1);
+                    ctx.quadraticCurveTo(cx, cy, x2, y2);
+                }
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // 飞机
                 ctx.font = '28px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
@@ -737,10 +801,10 @@
                 ctx.fillStyle = '#ffd700';
                 ctx.fillText('✈️', x, y);
                 ctx.shadowBlur = 0;
+
                 requestAnimationFrame(animatePlane);
             }
 
-            drawStatic();
             animatePlane();
         }
 
@@ -773,7 +837,19 @@
         function generateStars(){ const container=document.getElementById('starsContainer'); for(let i=0;i<80;i++){ const star=document.createElement('div'); star.className='star'; const size=Math.random()*3+1; star.style.width=size+'px'; star.style.height=size+'px'; star.style.left=Math.random()*100+'%'; star.style.top=Math.random()*100+'%'; star.style.animationDelay=Math.random()*3+'s'; star.style.animationDuration=(1.5+Math.random()*2)+'s'; container.appendChild(star); } }
 
         // ==================== 初始化 ====================
-        window.onload = function(){ generateStars(); showHearts(); typeLoginTitle(); updateVinylPlayer(); renderGifts(); setTimeout(()=>{ if(document.getElementById('page-home').classList.contains('active')){ initTravelMap(); } },500); };
+        window.onload = function(){
+            generateStars();
+            showHearts();
+            typeLoginTitle();
+            updateVinylPlayer();
+            renderGifts();
+            // 延迟加载地图
+            setTimeout(() => {
+                if (document.getElementById('page-home').classList.contains('active')) {
+                    initTravelMap();
+                }
+            }, 500);
+        };
     </script>
 </body>
 </html>
