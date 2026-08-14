@@ -7,7 +7,6 @@
     <title>生日快乐，我的宝贝</title>
     <script src="https://cdn.bootcdn.net/ajax/libs/canvas-confetti/1.6.0/confetti.browser.min.js"></script>
     <style>
-        /* ===== 完整样式 ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --bg-dark: #1a1a2e;
@@ -59,7 +58,6 @@
         }
         .container { max-width: 600px; width: 100%; text-align: center; position: relative; z-index: 2; }
 
-        /* 首页布局 */
         .home-layout {
             display: flex;
             flex-wrap: wrap;
@@ -69,14 +67,9 @@
             max-width: 1100px;
             margin: 0 auto;
         }
-        .home-layout .home-content {
-            flex: 1 1 45%;
-            min-width: 280px;
-            text-align: center;
-        }
+        .home-layout .home-content { flex: 1 1 45%; min-width: 280px; text-align: center; }
         .home-layout .home-map-wrapper {
-            flex: 1 1 45%;
-            min-width: 300px;
+            flex: 1 1 45%; min-width: 300px;
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: 24px;
@@ -85,19 +78,10 @@
             display: flex;
             flex-direction: column;
         }
-        .home-layout .home-map-wrapper h2 {
-            font-size: 1.4rem;
-            margin-bottom: 6px;
-            color: var(--pink-light);
-        }
-        .home-layout .home-map-wrapper p {
-            font-size: 0.9rem;
-            color: #aaa;
-            margin-bottom: 12px;
-        }
+        .home-layout .home-map-wrapper h2 { font-size: 1.4rem; margin-bottom: 6px; color: var(--pink-light); }
+        .home-layout .home-map-wrapper p { font-size: 0.9rem; color: #aaa; margin-bottom: 12px; }
         #travelMap {
-            width: 100%;
-            height: 420px;
+            width: 100%; height: 420px;
             border-radius: 16px;
             background: rgba(0,0,0,0.2);
             flex: 1;
@@ -115,21 +99,53 @@
             .home-layout .home-map-wrapper { padding: 14px; }
         }
 
-        /* 其余样式 */
         h1 { font-size: 2.8rem; margin-bottom: 20px; text-shadow: 0 0 25px rgba(255,105,157,0.9); animation: float 3s ease-in-out infinite; color: var(--pink-light); }
         h2 { font-size: 1.9rem; margin-bottom: 15px; color: var(--pink-light); }
         p { font-size: 1.1rem; line-height: 1.8; margin-bottom: 15px; color: var(--text-secondary); }
-        .btn { display: inline-block; padding: 14px 32px; margin: 10px 8px; border: none; border-radius: 50px; background: linear-gradient(135deg, #ff6b9d, #ff8e8e); color: #fff; font-size: 1rem; font-weight: bold; cursor: pointer; transition: all 0.3s; box-shadow: 0 6px 20px rgba(255,107,157,0.5); text-decoration: none; letter-spacing: 1px; position: relative; overflow: hidden; }
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            margin: 10px 8px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #ff6b9d, #ff8e8e);
+            color: #fff;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(255,107,157,0.5);
+            text-decoration: none;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
         .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(255,107,157,0.8); }
         .btn:active { transform: translateY(0); }
         .btn-secondary { background: linear-gradient(135deg, #667eea, #764ba2); box-shadow: 0 6px 20px rgba(102,126,234,0.5); }
         .btn-secondary:hover { box-shadow: 0 10px 30px rgba(102,126,234,0.8); }
         .btn-gold { background: linear-gradient(135deg, #f6d365, #fda085); box-shadow: 0 6px 20px rgba(246,211,101,0.5); color: #333; }
-        input[type="password"], input[type="text"] { width: 80%; max-width: 300px; padding: 14px 20px; margin: 10px 0; border: 2px solid rgba(255,255,255,0.2); border-radius: 50px; background: rgba(255,255,255,0.1); color: #fff; font-size: 1rem; text-align: center; outline: none; backdrop-filter: blur(10px); transition: all 0.3s; }
+        input[type="password"], input[type="text"] {
+            width: 80%; max-width: 300px;
+            padding: 14px 20px; margin: 10px 0;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 50px;
+            background: rgba(255,255,255,0.1);
+            color: #fff; font-size: 1rem; text-align: center;
+            outline: none;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
         input:focus { border-color: var(--pink); background: rgba(255,255,255,0.2); box-shadow: 0 0 20px rgba(255,105,157,0.5); }
         .login-input-wrapper { position: relative; display: inline-block; width: 80%; max-width: 300px; }
         .login-input-wrapper input { width: 100%; margin: 10px 0; }
-        .hint-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.15); border: none; color: #fff; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 1rem; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
+        .hint-btn {
+            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+            background: rgba(255,255,255,0.15); border: none; color: #fff;
+            border-radius: 50%; width: 32px; height: 32px;
+            cursor: pointer; font-size: 1rem;
+            display: flex; align-items: center; justify-content: center;
+        }
         .hint-btn:hover { background: rgba(255,255,255,0.3); }
         .btn-loading { pointer-events: none; opacity: 0.8; }
         .btn-loading .btn-text { display: inline-block; margin-right: 8px; }
@@ -144,6 +160,7 @@
         .progress-text { font-size: 0.85rem; color: #aaa; margin-bottom: 5px; }
         .progress-bar-outer { width: 100%; height: 8px; background: rgba(255,255,255,0.15); border-radius: 4px; overflow: hidden; }
         .progress-bar-inner { height: 100%; background: linear-gradient(90deg, #ff6b9d, #ffd700); border-radius: 4px; transition: width 0.3s; width: 0%; }
+
         .cake-scene { position: relative; width: 250px; height: 300px; margin: 20px auto; animation: float 3s ease-in-out infinite; cursor: pointer; }
         .cake-bottom { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 180px; height: 100px; background: linear-gradient(135deg, #ff9a9e, #fad0c4); border-radius: 12px 12px 5px 5px; box-shadow: 0 10px 30px rgba(255,154,158,0.7); }
         .cake-bottom::before { content: ''; position: absolute; top: -15px; left: 5%; width: 90%; height: 15px; background: #fff; border-radius: 50%; opacity: 0.9; }
@@ -403,7 +420,7 @@
                 { src: "16.jpg", caption: "记录第一次全款拿下喜欢的包包", backText: "独立女人最有魅力" },
                 { src: "17.jpg", caption: "总是喜欢趁我睡觉偷拍", backText: "什么样的我你也觉得好看" },
                 { src: "18.jpg", caption: "女司机第一次上路", backText: "坐你的车我放心" },
-                // 视频配置：使用封面图，不预加载
+                // 视频配置：封面图 + 弹窗播放
                 { src: "video1.mp4", caption: "俩个懒人的较真", type: "video", backText: "实际上我都做了", poster: "video1.jpg" },
                 { src: "video2.mp4", caption: "我在这儿等着你回来", type: "video", backText: "等你，永远不嫌久", poster: "video2.jpg" },
                 { src: "video3.mp4", caption: "工作状态不敢打扰她", type: "video", backText: "认真的你最有魅力", poster: "video3.jpg" },
@@ -545,68 +562,75 @@
         // ==================== 盲盒 ====================
         function renderGifts(){ const g=document.getElementById('giftGrid'); if(!g)return; g.innerHTML=''; config.gifts.forEach((gift,index)=>{ const box=document.createElement('div'); box.className='gift-box closed'; box.innerHTML=`<div class="gift-icon">🎁</div><div class="gift-hint">点击拆开</div><div class="gift-content"><img src="${gift.img}" alt="${gift.name}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22120%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23333%22/><text x=%2250%25%22 y=%2250%25%22 fill=%22%23fff%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2212%22>礼物图片</text></svg>'"><div class="gift-name">${gift.name}</div></div>`; box.addEventListener('click',function(){ if(this.classList.contains('closed')){ this.classList.remove('closed'); this.classList.add('opened'); launchConfetti(); } }); g.appendChild(box); }); }
 
-        // ==================== 时间线（视频使用 img 封面） ====================
-       function renderPhotos(){
-    const grid = document.getElementById('photoGrid');
-    grid.innerHTML = '';
-    config.photos.forEach((photo, index) => {
-        const card = document.createElement('div');
-        card.className = 'flip-card';
-        card.id = 'memory-card-' + index;
+        // ==================== 时间线（视频弹窗播放） ====================
+        function renderPhotos(){
+            const grid = document.getElementById('photoGrid');
+            grid.innerHTML = '';
+            config.photos.forEach((photo, index) => {
+                const card = document.createElement('div');
+                card.className = 'flip-card';
+                card.id = 'memory-card-' + index;
 
-        if (photo.type === 'video') {
-            // 视频卡片：显示封面图，点击打开弹窗播放
-            card.innerHTML = `
-                <div class="flip-card-inner">
-                    <div class="flip-card-front" style="position:relative; overflow:hidden; cursor:pointer;">
-                        <img src="${photo.poster || 'video-placeholder.jpg'}" alt="视频封面" style="width:100%;height:100%;object-fit:cover;display:block;">
-                        <div class="video-icon" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3rem;color:white;text-shadow:0 0 20px rgba(0,0,0,0.8);pointer-events:none;">▶️</div>
-                        <div class="photo-caption">${photo.caption}</div>
-                    </div>
-                    <div class="flip-card-back">
-                        <div class="back-text">${photo.backText || '这一刻，我永远记得 ❤️'}</div>
-                        <button class="back-btn" onclick="event.stopPropagation(); openVideoModal(config.photos[${index}])">播放视频</button>
-                    </div>
-                </div>
-            `;
-            // 点击封面打开弹窗
-            const front = card.querySelector('.flip-card-front');
-            front.addEventListener('click', function(e) {
-                e.stopPropagation();
-                // 如果卡片翻转，翻回正面
-                if (card.classList.contains('flipped')) {
-                    card.classList.remove('flipped');
+                if (photo.type === 'video') {
+                    // 视频卡片：封面图，点击触发弹窗
+                    card.innerHTML = `
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front" style="position:relative; overflow:hidden; cursor:pointer;">
+                                <img src="${photo.poster || 'video-placeholder.jpg'}" alt="视频封面" style="width:100%;height:100%;object-fit:cover;display:block;">
+                                <div class="video-icon" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:3rem;color:white;text-shadow:0 0 20px rgba(0,0,0,0.8);pointer-events:none;">▶️</div>
+                                <div class="photo-caption">${photo.caption}</div>
+                            </div>
+                            <div class="flip-card-back">
+                                <div class="back-text">${photo.backText || '这一刻，我永远记得 ❤️'}</div>
+                                <button class="back-btn" onclick="event.stopPropagation(); openVideoModal(config.photos[${index}])">播放视频</button>
+                            </div>
+                        </div>
+                    `;
+                    // 点击封面打开弹窗
+                    const front = card.querySelector('.flip-card-front');
+                    front.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        // 如果卡片翻转，翻回正面
+                        if (card.classList.contains('flipped')) {
+                            card.classList.remove('flipped');
+                        }
+                        openVideoModal(photo);
+                    });
+                } else {
+                    // 图片卡片
+                    card.innerHTML = `
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front">
+                                <img src="${photo.src}" alt="回忆" loading="lazy" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22500%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23333%22/><text x=%2250%25%22 y=%2250%25%22 fill=%22%23fff%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2220%22>回忆</text></svg>'">
+                                <div class="photo-caption">${photo.caption}</div>
+                            </div>
+                            <div class="flip-card-back">
+                                <div class="back-text">${photo.backText || '这一刻，我永远记得 ❤️'}</div>
+                                <button class="back-btn" onclick="event.stopPropagation(); openPhotoModal(config.photos[${index}])">查看大图</button>
+                            </div>
+                        </div>
+                    `;
                 }
-                // 打开弹窗播放
-                openVideoModal(photo);
+
+                // 翻转逻辑
+                card.addEventListener('click', function(e) {
+                    if (e.target.tagName === 'BUTTON') return;
+                    this.classList.toggle('flipped');
+                    markAsViewed(index);
+                });
+
+                grid.appendChild(card);
             });
-        } else {
-            // 图片卡片
-            card.innerHTML = `
-                <div class="flip-card-inner">
-                    <div class="flip-card-front">
-                        <img src="${photo.src}" alt="回忆" loading="lazy" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22500%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23333%22/><text x=%2250%25%22 y=%2250%25%22 fill=%22%23fff%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2220%22>回忆</text></svg>'">
-                        <div class="photo-caption">${photo.caption}</div>
-                    </div>
-                    <div class="flip-card-back">
-                        <div class="back-text">${photo.backText || '这一刻，我永远记得 ❤️'}</div>
-                        <button class="back-btn" onclick="event.stopPropagation(); openPhotoModal(config.photos[${index}])">查看大图</button>
-                    </div>
-                </div>
-            `;
+            updateProgress();
         }
+        function markAsViewed(index){ if(!viewedMemories.has(index)){ viewedMemories.add(index); updateProgress(); } }
+        function updateProgress(){ const total=config.photos.length; const viewed=viewedMemories.size; const percent=total>0?Math.round((viewed/total)*100):0; document.getElementById('progressPercent').textContent=percent; document.getElementById('progressBarInner').style.width=percent+'%'; }
+        function randomMemory(){ const cards=document.querySelectorAll('.flip-card'); if(cards.length===0)return; const idx=Math.floor(Math.random()*cards.length); const target=cards[idx]; target.scrollIntoView({behavior:'smooth',block:'center'}); target.classList.add('highlight-card'); setTimeout(()=>target.classList.remove('highlight-card'),2000); }
+        function openPhotoModal(photo){ document.getElementById('photoModalImg').src=photo.src; document.getElementById('photoModalCaption').textContent=photo.caption; document.getElementById('photoModal').classList.add('active'); }
+        function closePhotoModal(){ document.getElementById('photoModal').classList.remove('active'); document.getElementById('photoModalImg').src=""; }
+        function openVideoModal(photo){ const v=document.getElementById('videoModalPlayer'); v.onerror=null; v.src=photo.src; v.setAttribute('playsinline',''); v.setAttribute('controls',''); document.getElementById('videoModalCaption').textContent=photo.caption; document.getElementById('videoModal').classList.add('active'); v.play().catch(()=>{}); v.onerror=function(){ alert('视频加载失败，请检查文件路径或格式是否支持。'); closeVideoModal(); }; }
+        function closeVideoModal(){ const v=document.getElementById('videoModalPlayer'); v.pause(); v.onerror=null; v.src=""; document.getElementById('videoModal').classList.remove('active'); }
 
-        // 翻转逻辑
-        card.addEventListener('click', function(e) {
-            if (e.target.tagName === 'BUTTON') return;
-            this.classList.toggle('flipped');
-            markAsViewed(index);
-        });
-
-        grid.appendChild(card);
-    });
-    updateProgress();
-}
         // ==================== 情书 ====================
         function renderLetter(){
             const div=document.getElementById('letterContent');
@@ -726,7 +750,6 @@
             const W = canvas.width, H = canvas.height;
 
             function drawScene(angle) {
-                // 背景
                 const bgGrad = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, Math.max(W, H)*0.7);
                 bgGrad.addColorStop(0, '#0b0e2a');
                 bgGrad.addColorStop(0.5, '#1a1e4a');
@@ -734,7 +757,6 @@
                 ctx.fillStyle = bgGrad;
                 ctx.fillRect(0, 0, W, H);
 
-                // 星星
                 for (let i = 0; i < 60; i++) {
                     const x = (i * 137.508) % W;
                     const y = (i * 97.31) % (H * 0.8);
@@ -749,7 +771,6 @@
                 }
                 ctx.shadowBlur = 0;
 
-                // 地球
                 const cx = W/2, cy = H/2;
                 const radius = Math.min(W, H) * 0.38;
                 const earthGrad = ctx.createRadialGradient(cx - radius*0.25, cy - radius*0.25, 0, cx, cy, radius);
@@ -765,7 +786,6 @@
                 ctx.fill();
                 ctx.shadowBlur = 0;
 
-                // 大陆
                 const continents = [
                     { x: 0.30, y: 0.25, rx: 0.18, ry: 0.12, rot: 0.2 },
                     { x: 0.50, y: 0.22, rx: 0.15, ry: 0.10, rot: -0.1 },
@@ -794,7 +814,6 @@
                 });
                 ctx.shadowBlur = 0;
 
-                // 光环轨道
                 const orbitRadius = radius * 0.88;
                 ctx.beginPath();
                 ctx.arc(cx, cy, orbitRadius, 0, Math.PI*2);
@@ -804,7 +823,6 @@
                 ctx.stroke();
                 ctx.setLineDash([]);
 
-                // 两个小人
                 const people = ['👦', '👧'];
                 const colors = ['#ff6b9d', '#ffd700'];
                 people.forEach((emoji, i) => {
@@ -827,7 +845,6 @@
                     ctx.shadowBlur = 0;
                 });
 
-                // 底部文字
                 ctx.font = 'bold 16px "PingFang SC", "Microsoft YaHei", sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
