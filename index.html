@@ -635,65 +635,144 @@
         function createHeartExplosion(){ const container=document.body; const hearts=['❤️','💖','💕','💗','💘','💝']; for(let i=0;i<80;i++){ const heart=document.createElement('div'); heart.textContent=hearts[Math.floor(Math.random()*hearts.length)]; heart.style.cssText=`position:fixed;top:50%;left:50%;font-size:${Math.random()*30+20}px;z-index:1000;pointer-events:none;animation:heartBurst ${1.5+Math.random()*2}s ease-out forwards;`; const angle=Math.random()*Math.PI*2; const distance=100+Math.random()*300; const dx=Math.cos(angle)*distance; const dy=Math.sin(angle)*distance; heart.style.setProperty('--dx',dx+'px'); heart.style.setProperty('--dy',dy+'px'); container.appendChild(heart); setTimeout(()=>heart.remove(),3500); } }
 
         // ==================== 地图（静态两个小人） ====================
-        function initTravelMap() {
-            const canvas = document.getElementById('travelMap');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const W = canvas.width, H = canvas.height;
+       function initTravelMap() {
+    const canvas = document.getElementById('travelMap');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
 
-            // 背景
-            ctx.fillStyle = '#0a0e27';
-            ctx.fillRect(0, 0, W, H);
+    // 1. 背景：星空渐变
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+    bgGrad.addColorStop(0, '#0b1a2e');
+    bgGrad.addColorStop(0.5, '#1b3a5c');
+    bgGrad.addColorStop(1, '#2a5f7a');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, W, H);
 
-            // 地球
-            const cx = W/2, cy = H/2;
-            const radius = Math.min(W, H) * 0.38;
-            const grad = ctx.createRadialGradient(cx - radius*0.2, cy - radius*0.2, 0, cx, cy, radius);
-            grad.addColorStop(0, '#4fc3f7');
-            grad.addColorStop(0.6, '#0288d1');
-            grad.addColorStop(1, '#01579b');
+    // 绘制星星（小光点）
+    function drawStars() {
+        // 使用固定种子，避免每次刷新变化
+        const stars = [
+            [0.1,0.1,1.5],[0.2,0.3,2],[0.3,0.05,1],[0.5,0.08,1.5],[0.7,0.15,2],
+            [0.8,0.2,1],[0.9,0.05,1.5],[0.05,0.4,2],[0.15,0.5,1],[0.25,0.6,1.5],
+            [0.4,0.7,1],[0.6,0.8,2],[0.75,0.9,1.5],[0.85,0.7,1],[0.95,0.6,2],
+            [0.02,0.2,1],[0.98,0.1,1.5],[0.12,0.8,1],[0.35,0.9,1.5],[0.55,0.95,1]
+        ];
+        stars.forEach(([x, y, r]) => {
             ctx.beginPath();
-            ctx.arc(cx, cy, radius, 0, Math.PI*2);
-            ctx.fillStyle = grad;
-            ctx.shadowColor = 'rgba(100,200,255,0.3)';
-            ctx.shadowBlur = 40;
+            ctx.arc(x * W, y * H, r, 0, 2 * Math.PI);
+            ctx.fillStyle = 'rgba(255,255,240,0.8)';
+            ctx.shadowColor = 'rgba(255,255,200,0.2)';
+            ctx.shadowBlur = 8;
             ctx.fill();
-            ctx.shadowBlur = 0;
+        });
+        ctx.shadowBlur = 0;
+    }
+    drawStars();
 
-            // 大陆斑点
-            const continents = [[0.35,0.30,0.25],[0.55,0.25,0.20],[0.70,0.35,0.15],[0.45,0.50,0.30],[0.65,0.55,0.20],[0.30,0.60,0.25],[0.50,0.70,0.20],[0.75,0.70,0.15]];
-            continents.forEach(([dx, dy, size]) => {
-                const x = cx + (dx - 0.5) * radius * 1.6;
-                const y = cy + (dy - 0.5) * radius * 1.6;
-                const r = size * radius * 0.25;
-                ctx.beginPath();
-                ctx.arc(x, y, r, 0, Math.PI*2);
-                ctx.fillStyle = 'rgba(76, 175, 80, 0.7)';
-                ctx.shadowColor = 'rgba(76,175,80,0.3)';
-                ctx.shadowBlur = 12;
-                ctx.fill();
-            });
-            ctx.shadowBlur = 0;
+    // 2. 地球
+    const cx = W/2, cy = H/2;
+    const radius = Math.min(W, H) * 0.38;
+    // 地球外发光
+    ctx.shadowColor = 'rgba(100,200,255,0.2)';
+    ctx.shadowBlur = 50;
+    // 地球渐变
+    const earthGrad = ctx.createRadialGradient(cx - radius*0.2, cy - radius*0.2, 0, cx, cy, radius);
+    earthGrad.addColorStop(0, '#80deea');
+    earthGrad.addColorStop(0.5, '#4fc3f7');
+    earthGrad.addColorStop(0.8, '#0288d1');
+    earthGrad.addColorStop(1, '#01579b');
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, 2 * Math.PI);
+    ctx.fillStyle = earthGrad;
+    ctx.fill();
+    ctx.shadowBlur = 0;
 
-            // 两个小人的位置（不移动）
-            const people = ['👦', '👧'];
-            const orbitRadius = radius * 0.85;
-            people.forEach((emoji, i) => {
-                const angle = i * Math.PI; // 相对180度
-                const x = cx + Math.cos(angle) * orbitRadius;
-                const y = cy + Math.sin(angle) * orbitRadius;
-                ctx.font = '36px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(emoji, x, y);
-            });
+    // 大陆（更丰富的绿色）
+    const continents = [
+        [0.35,0.30,0.25], [0.55,0.25,0.20], [0.70,0.35,0.15],
+        [0.45,0.50,0.30], [0.65,0.55,0.20], [0.30,0.60,0.25],
+        [0.50,0.70,0.20], [0.75,0.70,0.15]
+    ];
+    continents.forEach(([dx, dy, size]) => {
+        const x = cx + (dx - 0.5) * radius * 1.6;
+        const y = cy + (dy - 0.5) * radius * 1.6;
+        const r = size * radius * 0.25;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, 2 * Math.PI);
+        ctx.fillStyle = 'rgba(129, 199, 132, 0.8)';
+        ctx.shadowColor = 'rgba(129,199,132,0.3)';
+        ctx.shadowBlur = 15;
+        ctx.fill();
+    });
+    ctx.shadowBlur = 0;
 
-            // 文字
-            ctx.font = '14px sans-serif';
-            ctx.fillStyle = 'rgba(255,255,255,0.5)';
-            ctx.textAlign = 'center';
-            ctx.fillText('❤️ 我们一起走遍世界 ❤️', cx, H - 25);
-        }
+    // 地球经纬线装饰（增加细节）
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([2, 4]);
+    // 纬线
+    for (let i = -2; i <= 2; i++) {
+        if (i === 0) continue;
+        const y = cy + i * radius * 0.3;
+        ctx.beginPath();
+        ctx.ellipse(cx, y, radius * 0.9, radius * 0.05, 0, 0, 2 * Math.PI);
+        ctx.stroke();
+    }
+    // 经线
+    for (let i = 0; i < 6; i++) {
+        const angle = (i / 6) * 2 * Math.PI;
+        ctx.beginPath();
+        ctx.moveTo(cx + radius * 0.9 * Math.cos(angle), cy + radius * 0.9 * Math.sin(angle));
+        ctx.lineTo(cx + radius * 1.0 * Math.cos(angle), cy + radius * 1.0 * Math.sin(angle));
+        ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    // 3. 两个小人（带光晕和动态效果，但保持静态位置）
+    const people = [
+        { emoji: '👦', angle: 0, label: '我' },
+        { emoji: '👧', angle: Math.PI, label: '你' }
+    ];
+    const orbitRadius = radius * 0.85;
+    people.forEach((p, i) => {
+        const angle = p.angle;
+        const x = cx + Math.cos(angle) * orbitRadius;
+        const y = cy + Math.sin(angle) * orbitRadius;
+        // 光晕
+        const glow = ctx.createRadialGradient(x, y-5, 0, x, y-5, 25);
+        glow.addColorStop(0, 'rgba(255,215,0,0.6)');
+        glow.addColorStop(1, 'rgba(255,215,0,0)');
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(x, y-5, 25, 0, 2 * Math.PI);
+        ctx.fill();
+        // 小人
+        ctx.font = '42px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.shadowColor = 'rgba(255,215,0,0.5)';
+        ctx.shadowBlur = 20;
+        ctx.fillText(p.emoji, x, y-5);
+        ctx.shadowBlur = 0;
+        // 小标签
+        ctx.font = '12px "PingFang SC", sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+        ctx.shadowColor = 'rgba(0,0,0,0.8)';
+        ctx.shadowBlur = 6;
+        ctx.fillText(p.label, x, y + 30);
+        ctx.shadowBlur = 0;
+    });
+
+    // 4. 底部爱心文字
+    ctx.font = '16px "PingFang SC", sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.textAlign = 'center';
+    ctx.shadowColor = 'rgba(0,0,0,0.8)';
+    ctx.shadowBlur = 8;
+    ctx.fillText('💕 我们一起走遍世界 💕', cx, H - 20);
+    ctx.shadowBlur = 0;
+}
 
         // ==================== 音乐播放 ====================
         function updateVinylPlayer(){ const player=document.getElementById('vinylPlayer'); const name=document.getElementById('currentSongName'); if(musicPlaying&&musicList.length>0){ player.classList.add('playing'); const title=config.musicTitles?config.musicTitles[currentSongIndex]:'未知歌曲'; name.textContent=title||'未知歌曲'; }else{ player.classList.remove('playing'); name.textContent=musicPlaying?'播放中...':'未播放'; } const vis=document.getElementById('visualizer'); vis.style.display=musicPlaying?'flex':'none'; }
