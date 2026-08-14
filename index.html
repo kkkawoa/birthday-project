@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="referrer" content="no-referrer">
     <title>生日快乐，我的宝贝</title>
     <script src="https://cdn.bootcdn.net/ajax/libs/canvas-confetti/1.6.0/confetti.browser.min.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
     <style>
-        /* ===== 完整样式 ===== */
+        /* ===== 全局样式 ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --bg-dark: #1a1a2e;
@@ -102,24 +102,11 @@
             background: rgba(0,0,0,0.2);
             flex: 1;
             min-height: 300px;
+            display: block;
+            margin: 0 auto;
         }
-        .map-loading {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: #aaa;
-            gap: 12px;
-        }
-        .map-loading .loader {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(255,255,255,0.15);
-            border-top-color: var(--pink);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
+        .map-loading { display: none; } /* 不再需要 */
+
         @media (max-width: 820px) {
             .home-layout .home-content { flex: 1 1 100%; }
             .home-layout .home-map-wrapper { flex: 1 1 100%; min-height: 380px; }
@@ -130,7 +117,7 @@
             .home-layout .home-map-wrapper { padding: 14px; }
         }
 
-        /* 其余样式（与之前一致） */
+        /* ===== 其余样式（与之前完全一致） ===== */
         h1 { font-size: 2.8rem; margin-bottom: 20px; text-shadow: 0 0 25px rgba(255,105,157,0.9); animation: float 3s ease-in-out infinite; color: var(--pink-light); }
         h2 { font-size: 1.9rem; margin-bottom: 15px; color: var(--pink-light); }
         p { font-size: 1.1rem; line-height: 1.8; margin-bottom: 15px; color: var(--text-secondary); }
@@ -336,7 +323,7 @@
                 <div class="home-map-wrapper">
                     <h2>✈️ 我们的旅行足迹</h2>
                     <p>太原 → 西安 → 长沙 → 三亚 → 万宁 → 北京</p>
-                    <div id="travelMap"><div class="map-loading" id="mapLoading"><div class="loader"></div><span>地图加载中，请稍候...</span></div></div>
+                    <canvas id="travelMap" width="600" height="500"></canvas>
                 </div>
             </div>
         </div>
@@ -374,6 +361,7 @@
     <div class="modal" id="secondQuestionModal"><div class="modal-content"><h2>💭 最后一个问题</h2><p style="font-size:1.1rem; color:#fff;">此时此刻你想我吗？</p><div class="second-question-buttons"><button class="btn" onclick="answerSecondQuestion('想')">想</button><button class="btn btn-secondary" onclick="answerSecondQuestion('不想')">不想</button></div><div id="secondQuestionResult"></div><button class="btn close-btn" onclick="closeSecondQuestion()">关闭</button></div></div>
     <div class="modal" id="gameModal"><div class="modal-content"><h2 style="font-size:1.6rem; margin-bottom:20px;">做我永远的宝贝吗？</h2><button class="btn" id="agreeBtn" onclick="agreeForever()">💖 同意</button><button class="btn btn-secondary" id="rejectBtn" onmouseenter="moveRejectButton()" ontouchstart="moveRejectButton()" onclick="moveRejectButton()">😅 拒绝</button></div></div>
     <audio id="bgMusic"></audio>
+
     <script>
         // ==================== 配置 ====================
         const config = {
@@ -393,7 +381,11 @@
                 { name: "张祺的信", img: "gift6.jpg" },
                 { name: "关系复原胶", img: "gift7.jpg" }
             ],
-            sidePhotos: ["side1.jpg","side2.jpg","side3.jpg","side4.jpg","side5.jpg","side6.jpg","side7.jpg","side8.jpg","side9.jpg","side10.jpg","side11.jpg","side12.jpg","side13.jpg","side14.jpg","side15.jpg"],
+            sidePhotos: [
+                "side1.jpg","side2.jpg","side3.jpg","side4.jpg","side5.jpg",
+                "side6.jpg","side7.jpg","side8.jpg","side9.jpg","side10.jpg",
+                "side11.jpg","side12.jpg","side13.jpg","side14.jpg","side15.jpg"
+            ],
             photos: [
                 { src: "1.jpg", caption: "我们的开始", backText: "故事的起点，永远记得 ❤️" },
                 { src: "2.jpg", caption: "第一次给我过生日", backText: "你总是很会爱我" },
@@ -473,19 +465,7 @@
         let hasWished = false;
         let surveyCompleted = false;
         let gamePlayed = false;
-        let mapChart = null;
-        let mapDataLoaded = false;
         let planeAnimTimer = null;
-
-        const travelCities = [
-            { name:'太原', coords:[112.55,37.87], desc:'出发地' },
-            { name:'西安', coords:[108.94,34.26], desc:'古都之旅' },
-            { name:'长沙', coords:[112.97,28.23], desc:'美食之都' },
-            { name:'三亚', coords:[109.51,18.25], desc:'海岛度假' },
-            { name:'万宁', coords:[110.39,18.80], desc:'冲浪胜地' },
-            { name:'北京', coords:[116.40,39.90], desc:'首都之旅' }
-        ];
-        const flyRoutes = [{from:0,to:1},{from:1,to:2},{from:2,to:3},{from:3,to:4},{from:4,to:5}];
 
         // ==================== 工具函数 ====================
         function getMusicList() { return config.musicList || []; }
@@ -515,7 +495,7 @@
         function typeLoginTitle(){ const e=document.getElementById('loginTitle'); const t="生日快乐"; let i=0; e.innerHTML=''; function type(){ if(i<t.length){ e.innerHTML+=t.charAt(i); i++; setTimeout(type,150); }else{ const c=document.createElement('span'); c.className='type-cursor'; e.appendChild(c); } } type(); }
         function showHint(){ document.getElementById('hintMessage').textContent="你的生日（格式：YYYYMMDD）"; document.getElementById('hintModal').classList.add('active'); }
         function closeHint(){ document.getElementById('hintModal').classList.remove('active'); }
-        function checkPassword(){ if(isEntering)return; const input=document.getElementById('passwordInput').value; const btn=document.getElementById('enterBtn'); if(input===config.password){ isEntering=true; document.getElementById('passwordError').style.display='none'; btn.classList.add('btn-loading'); btn.innerHTML='<span class="btn-text">正在开启...</span><span class="spinner"></span>'; setTimeout(()=>{ showPage('page-home'); initHome(); startMusic(); renderGifts(); setTimeout(initTravelMap,400); isEntering=false; btn.classList.remove('btn-loading'); btn.innerHTML='<span class="btn-text">进入 ✨</span>'; },1500); }else{ document.getElementById('passwordError').style.display='block'; } }
+        function checkPassword(){ if(isEntering)return; const input=document.getElementById('passwordInput').value; const btn=document.getElementById('enterBtn'); if(input===config.password){ isEntering=true; document.getElementById('passwordError').style.display='none'; btn.classList.add('btn-loading'); btn.innerHTML='<span class="btn-text">正在开启...</span><span class="spinner"></span>'; setTimeout(()=>{ showPage('page-home'); initHome(); startMusic(); renderGifts(); isEntering=false; btn.classList.remove('btn-loading'); btn.innerHTML='<span class="btn-text">进入 ✨</span>'; },1500); }else{ document.getElementById('passwordError').style.display='block'; } }
 
         // ==================== 首页 ====================
         function initHome(){
@@ -588,25 +568,37 @@
         function toggleFutureItem(index,element){ element.classList.toggle('checked'); const icon=element.querySelector('.check-icon'); icon.textContent=element.classList.contains('checked')?'✅':'◻️'; const allItems=document.querySelectorAll('.future-item'); const allChecked=Array.from(allItems).every(item=>item.classList.contains('checked')); document.getElementById('futureCompleteMessage').style.display=allChecked?'block':'none'; }
         function renderSideScrollPhotos(){ const left=document.getElementById('sideScrollLeft'),right=document.getElementById('sideScrollRight'); if(!left||!right)return; let photos=config.sidePhotos||[]; if(photos.length===0){ const placeholders=['#ff6b9d','#ffd700','#667eea','#4caf50','#ff8e8e','#ffb6c1','#ffa07a']; for(let i=0;i<15;i++) photos.push(placeholders[i%placeholders.length]); } const half=Math.floor(photos.length/2); const leftPhotos=photos.slice(0,half),rightPhotos=photos.slice(half); left.innerHTML=''; right.innerHTML=''; function createTrack(photos){ const track=document.createElement('div'); track.className='side-scroll-track'; for(let repeat=0;repeat<2;repeat++){ photos.forEach(src=>{ const img=document.createElement('img'); img.src=src; img.alt="回忆"; img.className='side-scroll-img'; img.onerror=function(){ const ph=document.createElement('div'); ph.className='side-scroll-placeholder'; if(src.startsWith('#')){ ph.style.background=src; ph.textContent='📷'; }else{ ph.style.background='#555'; ph.textContent='📷'; } this.parentNode.replaceChild(ph,this); }; track.appendChild(img); }); } return track; } left.appendChild(createTrack(leftPhotos)); right.appendChild(createTrack(rightPhotos)); }
 
-        // ==================== 问卷（改用邮件） ====================
+        // ==================== 问卷（使用 formsubmit.co） ====================
         function openSurvey(){ const container=document.getElementById('surveyQuestions'); container.innerHTML=''; config.surveyQuestions.forEach((q,index)=>{ const div=document.createElement('div'); div.className='question-item'; div.innerHTML=`<label>${index+1}. ${q}</label><textarea id="surveyAns${index}" rows="2"></textarea>`; container.appendChild(div); }); document.getElementById('surveyModal').classList.add('active'); }
         function closeSurvey(){ document.getElementById('surveyModal').classList.remove('active'); }
         function submitSurvey(){
-            // 验证是否所有问题都已填写
             for(let i=0;i<config.surveyQuestions.length;i++){ const ans=document.getElementById(`surveyAns${i}`); if(!ans||ans.value.trim()===''){ alert('请回答所有问题后再提交哦～'); return; } }
-            // 收集答案并拼接成邮件正文
-            let body='问卷提交时间：'+new Date().toLocaleString()+'\n\n';
-            for(let i=0;i<config.surveyQuestions.length;i++){ const ans=document.getElementById(`surveyAns${i}`).value.trim(); body+=(i+1)+'. '+config.surveyQuestions[i]+'\n回答：'+ans+'\n\n'; }
-            // 构造 mailto 链接
-            const subject=encodeURIComponent('生日问卷答案');
-            const mailtoLink='mailto:2898334402@qq.com?subject='+subject+'&body='+encodeURIComponent(body);
-            // 打开默认邮件客户端
-            window.location.href=mailtoLink;
-            // 关闭弹窗并显示后续
-            closeSurvey();
-            document.getElementById('secondQuestionModal').classList.add('active');
-            document.getElementById('secondQuestionResult').style.display='none';
-            surveyCompleted=true;
+            const answers={}; for(let i=0;i<config.surveyQuestions.length;i++){ const ans=document.getElementById(`surveyAns${i}`).value.trim(); answers[config.surveyQuestions[i]]=ans; }
+            const formData = new FormData();
+            formData.append('_subject', '生日问卷答案');
+            formData.append('_captcha', 'false');
+            formData.append('_template', 'table');
+            formData.append('问卷内容', JSON.stringify(answers, null, 2));
+            formData.append('提交时间', new Date().toLocaleString());
+            fetch('https://formsubmit.co/ajax/2898334402@qq.com', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('✅ 问卷提交成功！谢谢你 💖');
+                    closeSurvey();
+                    document.getElementById('secondQuestionModal').classList.add('active');
+                    document.getElementById('secondQuestionResult').style.display = 'none';
+                    surveyCompleted = true;
+                } else {
+                    alert('❌ 提交失败，请稍后重试。');
+                }
+            })
+            .catch(err => {
+                console.error('提交错误:', err);
+                alert('网络错误，请检查网络连接。');
+            });
         }
         function answerSecondQuestion(choice){ const resultDiv=document.getElementById('secondQuestionResult'); resultDiv.style.display='block'; if(choice==='想'){ resultDiv.innerHTML='💖 我也很想你，联系我吧 💖'; }else{ resultDiv.innerHTML='🌙 没关系，我一直在想你 🌙'; } document.querySelectorAll('#secondQuestionModal .second-question-buttons .btn').forEach(btn=>btn.disabled=true); resultDiv.scrollIntoView({behavior:'smooth',block:'center'}); }
         function closeSecondQuestion(){ document.getElementById('secondQuestionModal').classList.remove('active'); }
@@ -618,107 +610,225 @@
         function agreeForever(){ document.getElementById('gameModal').classList.remove('active'); createHeartExplosion(); if(typeof confetti!=='undefined'){ confetti({particleCount:200,spread:100,origin:{y:0.6},colors:['#ff6b9d','#ffd700','#ff8e8e','#ffffff']}); } setTimeout(()=>{ showPage('page-final'); },1200); }
         function createHeartExplosion(){ const container=document.body; const hearts=['❤️','💖','💕','💗','💘','💝']; for(let i=0;i<80;i++){ const heart=document.createElement('div'); heart.textContent=hearts[Math.floor(Math.random()*hearts.length)]; heart.style.cssText=`position:fixed;top:50%;left:50%;font-size:${Math.random()*30+20}px;z-index:1000;pointer-events:none;animation:heartBurst ${1.5+Math.random()*2}s ease-out forwards;`; const angle=Math.random()*Math.PI*2; const distance=100+Math.random()*300; const dx=Math.cos(angle)*distance; const dy=Math.sin(angle)*distance; heart.style.setProperty('--dx',dx+'px'); heart.style.setProperty('--dy',dy+'px'); container.appendChild(heart); setTimeout(()=>heart.remove(),3500); } }
 
-        // ==================== 地图（已优化缓存） ====================
+        // ==================== 地图（卡通canvas版本） ====================
         function initTravelMap(){
-            const container = document.getElementById('travelMap');
-            if (!container) return;
-            if (mapChart) { mapChart.dispose(); mapChart = null; }
-            const loading = document.getElementById('mapLoading');
-            if (loading) loading.style.display = 'flex';
-            if (typeof echarts === 'undefined') {
-                if (loading) loading.innerHTML = '<span style="color:#ff8a8a;">地图库加载失败，请刷新重试</span>';
-                return;
-            }
-            mapChart = echarts.init(container);
-            // 尝试从 localStorage 读取缓存
-            const cachedGeo = localStorage.getItem('china_geo');
-            if (cachedGeo) {
-                try {
-                    const geoData = JSON.parse(cachedGeo);
-                    echarts.registerMap('china', geoData);
-                    mapDataLoaded = true;
-                    if (loading) loading.style.display = 'none';
-                    renderMap();
-                    window.addEventListener('resize', onMapResize);
-                    return;
-                } catch (e) { console.warn('缓存数据无效，重新加载'); }
-            }
-            // 无缓存，请求数据
-            const geoUrl = 'https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json';
-            fetch(geoUrl, { mode: 'cors' })
-                .then(res => { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
-                .then(data => {
-                    try { localStorage.setItem('china_geo', JSON.stringify(data)); } catch (e) {}
-                    echarts.registerMap('china', data);
-                    mapDataLoaded = true;
-                    if (loading) loading.style.display = 'none';
-                    renderMap();
-                    window.addEventListener('resize', onMapResize);
-                })
-                .catch(err => {
-                    console.error('地图加载失败:', err);
-                    if (loading) {
-                        loading.innerHTML = `
-                            <span style="font-size:2rem;">🗺️</span>
-                            <span>地图数据加载失败，请检查网络</span>
-                            <button class="btn btn-secondary" style="padding:8px 20px;font-size:0.85rem;margin-top:8px;" onclick="initTravelMap()">重试</button>
-                        `;
-                        loading.style.display = 'flex';
-                    }
-                });
-        }
-        function renderMap(){
-            if(!mapChart||!mapDataLoaded)return;
-            const linesData=flyRoutes.map(route=>{ const from=travelCities[route.from].coords,to=travelCities[route.to].coords; return{coords:[from,to],lineStyle:{color:'#ff6b9d',width:2,curveness:0.3,shadowBlur:10,shadowColor:'rgba(255,107,157,0.6)'}}; });
-            const option={
-                backgroundColor:'transparent',
-                tooltip:{trigger:'item',formatter:function(params){ if(params.seriesType==='scatter') return `<strong>${params.name}</strong><br/>${params.data.desc||''}`; return ''; }},
-                geo:{map:'china',roam:false,zoom:1.2,center:[108,35],itemStyle:{areaColor:'rgba(30,40,80,0.6)',borderColor:'rgba(255,255,255,0.25)',borderWidth:1.2,shadowBlur:10,shadowColor:'rgba(0,0,0,0.3)'},emphasis:{itemStyle:{areaColor:'rgba(255,107,157,0.25)'}},label:{show:false}},
-                series:[
-                    {name:'飞行轨迹',type:'lines',coordinateSystem:'geo',data:linesData,lineStyle:{width:2.5,curveness:0.3,shadowBlur:12,shadowColor:'rgba(255,107,157,0.5)'},effect:{show:true,period:4,trailLength:0.3,symbol:'arrow',symbolSize:10,color:'#ffd700'},zlevel:2},
-                    {name:'城市',type:'scatter',coordinateSystem:'geo',data:travelCities.map((city,idx)=>({name:city.name,value:city.coords,desc:city.desc,symbolSize:26,itemStyle:{color:new echarts.graphic.RadialGradient(0.5,0.5,0.5,[{color:'#ff6b9d',offset:0},{color:'#ff8e8e',offset:0.6},{color:'#ffb6c1',offset:1}]),shadowBlur:20,shadowColor:'rgba(255,107,157,0.7)'},label:{show:true,formatter:'{b}',position:'bottom',distance:8,color:'#fff',fontSize:13,fontWeight:'bold',textShadowBlur:6,textShadowColor:'rgba(0,0,0,0.8)'},emphasis:{scale:1.4,label:{fontSize:16,color:'#ffd700'}}})),symbolSize:26,zlevel:3,animationDelay:idx=>idx*200},
-                    {name:'光晕',type:'scatter',coordinateSystem:'geo',data:travelCities.map(c=>({value:c.coords,symbolSize:60,itemStyle:{color:'rgba(255,107,157,0.15)',shadowBlur:40,shadowColor:'rgba(255,107,157,0.3)'},label:{show:false}})),symbolSize:60,zlevel:1,animation:false},
-                    {name:'飞机',type:'effectScatter',coordinateSystem:'geo',data:flyRoutes.map((route,idx)=>{ const from=travelCities[route.from].coords; return { coord:from, value:'✈️', symbolSize:28, itemStyle:{ color:'#ffd700', shadowBlur:20, shadowColor:'rgba(255,215,0,0.8)' }, label:{ show:true, formatter:'✈️', fontSize:16, position:'center' } }; }),symbolSize:28,rippleEffect:{brushType:'stroke',scale:4,period:2},zlevel:4,animation:true,animationDuration:4000,animationEasing:'linear'}
-                ]
+            const canvas = document.getElementById('travelMap');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width, H = canvas.height;
+
+            // 简化的中国轮廓点（归一化0-1坐标，大致形状）
+            const points = [
+                [0.10,0.40],[0.14,0.36],[0.20,0.32],[0.28,0.30],[0.35,0.32],[0.42,0.28],
+                [0.50,0.30],[0.56,0.26],[0.62,0.22],[0.68,0.24],[0.74,0.28],[0.80,0.32],
+                [0.84,0.38],[0.82,0.44],[0.78,0.48],[0.72,0.52],[0.66,0.56],[0.58,0.58],
+                [0.50,0.60],[0.42,0.56],[0.36,0.52],[0.30,0.48],[0.24,0.44],[0.18,0.42],
+                [0.12,0.40]
+            ];
+            // 城市坐标（归一化）
+            const cities = {
+                '太原': [0.46,0.38],
+                '西安': [0.44,0.46],
+                '长沙': [0.52,0.54],
+                '三亚': [0.55,0.74],
+                '万宁': [0.58,0.72],
+                '北京': [0.58,0.30]
             };
-            mapChart.setOption(option);
-            startPlaneAnimation();
-            mapChart.on('click',function(params){ if(params.componentType==='series'&&params.seriesType==='scatter'){ const name=params.name||'未知城市'; const desc=params.data?.desc||''; alert(`📍 ${name}\n${desc}`); } });
-        }
-        function startPlaneAnimation(){
-            if(planeAnimTimer){ cancelAnimationFrame(planeAnimTimer); planeAnimTimer=null; }
-            let startTime=Date.now();
-            const totalDuration=8000;
-            function animate(){
-                if(!mapChart||!mapDataLoaded){ planeAnimTimer=requestAnimationFrame(animate); return; }
-                const elapsed=Date.now()-startTime;
-                const progress=(elapsed%totalDuration)/totalDuration;
-                const totalSegments=flyRoutes.length;
-                const segmentLen=1/totalSegments;
-                const segIndex=Math.min(Math.floor(progress/segmentLen),totalSegments-1);
-                const segProgress=(progress-segIndex*segmentLen)/segmentLen;
-                const route=flyRoutes[segIndex];
-                const from=travelCities[route.from].coords,to=travelCities[route.to].coords;
-                const t=Math.min(segProgress,1);
-                const cx=from[0]+(to[0]-from[0])*t;
-                const cy=from[1]+(to[1]-from[1])*t;
-                const curve=0.7;
-                const perpX=-(to[1]-from[1]),perpY=(to[0]-from[0]);
-                const len=Math.sqrt(perpX*perpX+perpY*perpY)||1;
-                const normX=perpX/len,normY=perpY/len;
-                const offsetX=normX*curve*Math.sin(t*Math.PI)*0.8;
-                const offsetY=normY*curve*Math.sin(t*Math.PI)*0.8;
-                const finalX=cx+offsetX,finalY=cy+offsetY;
-                const effectData=flyRoutes.map((r,idx)=>{
-                    if(idx===segIndex){ return{coord:[finalX,finalY],value:'✈️',symbolSize:32,itemStyle:{color:'#ffd700',shadowBlur:30,shadowColor:'rgba(255,215,0,0.9)'},label:{show:true,formatter:'✈️',fontSize:18,position:'center'}}; }
-                    else{ const rFrom=travelCities[r.from].coords; return{coord:rFrom,value:'',symbolSize:0,label:{show:false}}; }
-                });
-                try{ mapChart.setOption({ series:[{},{},{},{data:effectData}] }); }catch(e){}
-                planeAnimTimer=requestAnimationFrame(animate);
+            const cityOrder = ['太原','西安','长沙','三亚','万宁','北京'];
+
+            // 清空画布
+            ctx.clearRect(0, 0, W, H);
+
+            // 绘制背景
+            const grad = ctx.createLinearGradient(0,0,W,H);
+            grad.addColorStop(0, 'rgba(255, 215, 0, 0.15)');
+            grad.addColorStop(1, 'rgba(255, 105, 180, 0.15)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0,0,W,H);
+
+            // 绘制简化中国轮廓
+            ctx.beginPath();
+            points.forEach((p, i) => {
+                const x = p[0] * W, y = p[1] * H;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(255, 182, 193, 0.5)';
+            ctx.fill();
+            ctx.strokeStyle = '#ff6b9d';
+            ctx.lineWidth = 3;
+            ctx.shadowColor = '#ff6b9d';
+            ctx.shadowBlur = 10;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            // 绘制城市点
+            cityOrder.forEach(name => {
+                const pos = cities[name];
+                const x = pos[0] * W, y = pos[1] * H;
+                // 发光外圈
+                const grad2 = ctx.createRadialGradient(x, y, 0, x, y, 18);
+                grad2.addColorStop(0, '#ffd700');
+                grad2.addColorStop(0.6, '#ff6b9d');
+                grad2.addColorStop(1, 'transparent');
+                ctx.fillStyle = grad2;
+                ctx.beginPath();
+                ctx.arc(x, y, 18, 0, Math.PI*2);
+                ctx.fill();
+                // 实心点
+                ctx.beginPath();
+                ctx.arc(x, y, 6, 0, Math.PI*2);
+                ctx.fillStyle = '#fff';
+                ctx.shadowColor = '#ff6b9d';
+                ctx.shadowBlur = 12;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                // 城市名
+                ctx.font = 'bold 12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillStyle = '#fff';
+                ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                ctx.shadowBlur = 6;
+                ctx.fillText(name, x, y - 10);
+                ctx.shadowBlur = 0;
+            });
+
+            // 绘制航线（曲线）
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(255, 215, 0, 0.6)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([8, 6]);
+            for (let i = 0; i < cityOrder.length - 1; i++) {
+                const from = cities[cityOrder[i]];
+                const to = cities[cityOrder[i+1]];
+                const x1 = from[0]*W, y1 = from[1]*H;
+                const x2 = to[0]*W, y2 = to[1]*H;
+                const cx = (x1 + x2)/2;
+                const cy = (y1 + y2)/2 - 30;
+                ctx.moveTo(x1, y1);
+                ctx.quadraticCurveTo(cx, cy, x2, y2);
             }
-            animate();
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 飞机动画（用一个圆圈+✈️）
+            let progress = 0;
+            const totalSegments = cityOrder.length - 1;
+            const duration = 6000; // 6秒走完全程
+
+            function animatePlane() {
+                const elapsed = Date.now() % duration;
+                const t = elapsed / duration;
+                const total = totalSegments;
+                const segLen = 1 / total;
+                const segIndex = Math.min(Math.floor(t / segLen), total - 1);
+                const segProgress = (t - segIndex * segLen) / segLen;
+                const from = cities[cityOrder[segIndex]];
+                const to = cities[cityOrder[segIndex+1]];
+                const x1 = from[0]*W, y1 = from[1]*H;
+                const x2 = to[0]*W, y2 = to[1]*H;
+                const cx = (x1 + x2)/2;
+                const cy = (y1 + y2)/2 - 30;
+                // 二次贝塞尔插值
+                const u = segProgress;
+                const x = (1-u)*(1-u)*x1 + 2*(1-u)*u*cx + u*u*x2;
+                const y = (1-u)*(1-u)*y1 + 2*(1-u)*u*cy + u*u*y2;
+                // 清除上一次飞机绘制，但我们要重新绘制整个地图？为了效率，我们可以用分层，但简单起见，每帧重绘全部
+                // 但为了性能，我们只清除飞机区域，但更简单是重绘整个地图，但城市和航线不变，可以只重绘飞机，但为了清晰，我们使用覆盖方式。
+                // 采用双缓冲或局部清除，但我们用重绘所有（因为地图简单）
+                // 这里我们绘制整个地图但会闪烁，所以采用先保存画布内容，但为了简单，我们用离屏canvas？但这里只做演示，直接重绘。
+                // 更好的方法：每次清除后重新绘制所有内容，但飞机位置变化。
+                // 我们就重新绘制整个地图（因为简单）
+                ctx.clearRect(0, 0, W, H);
+                // 重新绘制背景、轮廓、城市、航线（但不重绘飞机）
+                drawStaticMap(ctx);
+                // 然后绘制飞机
+                ctx.font = '28px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.shadowColor = '#ffd700';
+                ctx.shadowBlur = 20;
+                ctx.fillStyle = '#ffd700';
+                ctx.fillText('✈️', x, y);
+                ctx.shadowBlur = 0;
+                requestAnimationFrame(animatePlane);
+            }
+
+            function drawStaticMap(ctx) {
+                // 背景
+                const grad = ctx.createLinearGradient(0,0,W,H);
+                grad.addColorStop(0, 'rgba(255, 215, 0, 0.15)');
+                grad.addColorStop(1, 'rgba(255, 105, 180, 0.15)');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0,0,W,H);
+                // 轮廓
+                ctx.beginPath();
+                points.forEach((p, i) => {
+                    const x = p[0] * W, y = p[1] * H;
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                });
+                ctx.closePath();
+                ctx.fillStyle = 'rgba(255, 182, 193, 0.5)';
+                ctx.fill();
+                ctx.strokeStyle = '#ff6b9d';
+                ctx.lineWidth = 3;
+                ctx.shadowColor = '#ff6b9d';
+                ctx.shadowBlur = 10;
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+                // 城市
+                cityOrder.forEach(name => {
+                    const pos = cities[name];
+                    const x = pos[0] * W, y = pos[1] * H;
+                    const grad2 = ctx.createRadialGradient(x, y, 0, x, y, 18);
+                    grad2.addColorStop(0, '#ffd700');
+                    grad2.addColorStop(0.6, '#ff6b9d');
+                    grad2.addColorStop(1, 'transparent');
+                    ctx.fillStyle = grad2;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 18, 0, Math.PI*2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(x, y, 6, 0, Math.PI*2);
+                    ctx.fillStyle = '#fff';
+                    ctx.shadowColor = '#ff6b9d';
+                    ctx.shadowBlur = 12;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    ctx.font = 'bold 12px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    ctx.fillStyle = '#fff';
+                    ctx.shadowColor = 'rgba(0,0,0,0.8)';
+                    ctx.shadowBlur = 6;
+                    ctx.fillText(name, x, y - 10);
+                    ctx.shadowBlur = 0;
+                });
+                // 航线
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(255, 215, 0, 0.6)';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([8, 6]);
+                for (let i = 0; i < cityOrder.length - 1; i++) {
+                    const from = cities[cityOrder[i]];
+                    const to = cities[cityOrder[i+1]];
+                    const x1 = from[0]*W, y1 = from[1]*H;
+                    const x2 = to[0]*W, y2 = to[1]*H;
+                    const cx = (x1 + x2)/2;
+                    const cy = (y1 + y2)/2 - 30;
+                    ctx.moveTo(x1, y1);
+                    ctx.quadraticCurveTo(cx, cy, x2, y2);
+                }
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+
+            // 开始动画
+            animatePlane();
         }
-        function onMapResize(){ if(mapChart) mapChart.resize(); }
 
         // ==================== 音乐播放 ====================
         function updateVinylPlayer(){ const player=document.getElementById('vinylPlayer'); const name=document.getElementById('currentSongName'); if(musicPlaying&&musicList.length>0){ player.classList.add('playing'); const title=config.musicTitles?config.musicTitles[currentSongIndex]:'未知歌曲'; name.textContent=title||'未知歌曲'; }else{ player.classList.remove('playing'); name.textContent=musicPlaying?'播放中...':'未播放'; } const vis=document.getElementById('visualizer'); vis.style.display=musicPlaying?'flex':'none'; }
@@ -749,7 +859,18 @@
         function generateStars(){ const container=document.getElementById('starsContainer'); for(let i=0;i<80;i++){ const star=document.createElement('div'); star.className='star'; const size=Math.random()*3+1; star.style.width=size+'px'; star.style.height=size+'px'; star.style.left=Math.random()*100+'%'; star.style.top=Math.random()*100+'%'; star.style.animationDelay=Math.random()*3+'s'; star.style.animationDuration=(1.5+Math.random()*2)+'s'; container.appendChild(star); } }
 
         // ==================== 初始化 ====================
-        window.onload = function(){ generateStars(); showHearts(); typeLoginTitle(); updateVinylPlayer(); renderGifts(); setTimeout(()=>{ if(document.getElementById('page-home').classList.contains('active')){ initTravelMap(); } },2000); };
+        window.onload = function(){
+            generateStars();
+            showHearts();
+            typeLoginTitle();
+            updateVinylPlayer();
+            renderGifts();
+            setTimeout(() => {
+                if (document.getElementById('page-home').classList.contains('active')) {
+                    initTravelMap();
+                }
+            }, 500);
+        };
     </script>
 </body>
 </html>
