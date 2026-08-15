@@ -7,6 +7,7 @@
     <title>生日快乐，我的宝贝</title>
     <script src="https://cdn.bootcdn.net/ajax/libs/canvas-confetti/1.6.0/confetti.browser.min.js"></script>
     <style>
+        /* 完整样式与之前一致，此处保留完整 */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --bg-dark: #1a1a2e;
@@ -420,7 +421,6 @@
                 { src: "16.jpg", caption: "记录第一次全款拿下喜欢的包包", backText: "独立女人最有魅力" },
                 { src: "17.jpg", caption: "总是喜欢趁我睡觉偷拍", backText: "什么样的我你也觉得好看" },
                 { src: "18.jpg", caption: "女司机第一次上路", backText: "坐你的车我放心" },
-                // 视频配置：使用封面图，点击弹出弹窗播放
                 { src: "video1.mp4", caption: "俩个懒人的较真", type: "video", backText: "实际上我都做了", poster: "video1.jpg" },
                 { src: "video2.mp4", caption: "我在这儿等着你回来", type: "video", backText: "等你，永远不嫌久", poster: "video2.jpg" },
                 { src: "video3.mp4", caption: "工作状态不敢打扰她", type: "video", backText: "认真的你最有魅力", poster: "video3.jpg" },
@@ -562,7 +562,7 @@
         // ==================== 盲盒 ====================
         function renderGifts(){ const g=document.getElementById('giftGrid'); if(!g)return; g.innerHTML=''; config.gifts.forEach((gift,index)=>{ const box=document.createElement('div'); box.className='gift-box closed'; box.innerHTML=`<div class="gift-icon">🎁</div><div class="gift-hint">点击拆开</div><div class="gift-content"><img src="${gift.img}" alt="${gift.name}" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22120%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23333%22/><text x=%2250%25%22 y=%2250%25%22 fill=%22%23fff%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2212%22>礼物图片</text></svg>'"><div class="gift-name">${gift.name}</div></div>`; box.addEventListener('click',function(){ if(this.classList.contains('closed')){ this.classList.remove('closed'); this.classList.add('opened'); launchConfetti(); } }); g.appendChild(box); }); }
 
-        // ==================== 时间线（视频封面点击打开弹窗，不翻转卡片） ====================
+        // ==================== 时间线（视频弹窗播放） ====================
         function renderPhotos(){
             const grid = document.getElementById('photoGrid');
             grid.innerHTML = '';
@@ -572,7 +572,6 @@
                 card.id = 'memory-card-' + index;
 
                 if (photo.type === 'video') {
-                    // 视频卡片：封面点击打开弹窗，不翻转
                     card.innerHTML = `
                         <div class="flip-card-inner">
                             <div class="flip-card-front" style="position:relative; overflow:hidden; cursor:pointer;">
@@ -586,14 +585,12 @@
                             </div>
                         </div>
                     `;
-                    // 点击封面打开弹窗，不翻转
                     const front = card.querySelector('.flip-card-front');
                     front.addEventListener('click', function(e) {
                         e.stopPropagation();
                         openVideoModal(photo);
                     });
                 } else {
-                    // 图片卡片
                     card.innerHTML = `
                         <div class="flip-card-inner">
                             <div class="flip-card-front">
@@ -608,14 +605,11 @@
                     `;
                 }
 
-                // 翻转逻辑：点击卡片（除了按钮和视频正面区域）触发翻转
                 card.addEventListener('click', function(e) {
-                    // 如果点击的是按钮或视频正面，不翻转
                     if (e.target.tagName === 'BUTTON') return;
                     if (photo.type === 'video') {
                         const front = this.querySelector('.flip-card-front');
                         if (front && front.contains(e.target)) {
-                            // 点击了视频正面，不翻转（我们已经单独处理了）
                             return;
                         }
                     }
@@ -632,12 +626,15 @@
         function randomMemory(){ const cards=document.querySelectorAll('.flip-card'); if(cards.length===0)return; const idx=Math.floor(Math.random()*cards.length); const target=cards[idx]; target.scrollIntoView({behavior:'smooth',block:'center'}); target.classList.add('highlight-card'); setTimeout(()=>target.classList.remove('highlight-card'),2000); }
         function openPhotoModal(photo){ document.getElementById('photoModalImg').src=photo.src; document.getElementById('photoModalCaption').textContent=photo.caption; document.getElementById('photoModal').classList.add('active'); }
         function closePhotoModal(){ document.getElementById('photoModal').classList.remove('active'); document.getElementById('photoModalImg').src=""; }
-        function openVideoModal(photo){ 
+        function openVideoModal(photo){
             const v = document.getElementById('videoModalPlayer');
             v.onerror = null;
             v.src = photo.src;
             v.setAttribute('playsinline', '');
+            v.setAttribute('webkit-playsinline', '');
+            v.setAttribute('x5-playsinline', '');
             v.setAttribute('controls', '');
+            v.setAttribute('preload', 'metadata');
             document.getElementById('videoModalCaption').textContent = photo.caption;
             document.getElementById('videoModal').classList.add('active');
             v.play().catch(() => {});
@@ -717,37 +714,34 @@
         function toggleFutureItem(index,element){ element.classList.toggle('checked'); const icon=element.querySelector('.check-icon'); icon.textContent=element.classList.contains('checked')?'✅':'◻️'; const allItems=document.querySelectorAll('.future-item'); const allChecked=Array.from(allItems).every(item=>item.classList.contains('checked')); document.getElementById('futureCompleteMessage').style.display=allChecked?'block':'none'; }
         function renderSideScrollPhotos(){ const left=document.getElementById('sideScrollLeft'),right=document.getElementById('sideScrollRight'); if(!left||!right)return; let photos=config.sidePhotos||[]; if(photos.length===0){ const placeholders=['#ff6b9d','#ffd700','#667eea','#4caf50','#ff8e8e','#ffb6c1','#ffa07a']; for(let i=0;i<15;i++) photos.push(placeholders[i%placeholders.length]); } const half=Math.floor(photos.length/2); const leftPhotos=photos.slice(0,half),rightPhotos=photos.slice(half); left.innerHTML=''; right.innerHTML=''; function createTrack(photos){ const track=document.createElement('div'); track.className='side-scroll-track'; for(let repeat=0;repeat<2;repeat++){ photos.forEach(src=>{ const img=document.createElement('img'); img.src=src; img.alt="回忆"; img.className='side-scroll-img'; img.onerror=function(){ const ph=document.createElement('div'); ph.className='side-scroll-placeholder'; if(src.startsWith('#')){ ph.style.background=src; ph.textContent='📷'; }else{ ph.style.background='#555'; ph.textContent='📷'; } this.parentNode.replaceChild(ph,this); }; track.appendChild(img); }); } return track; } left.appendChild(createTrack(leftPhotos)); right.appendChild(createTrack(rightPhotos)); }
 
-        // ==================== 问卷 ====================
+        // ==================== 问卷提交（mailto 方式） ====================
         function openSurvey(){ const container=document.getElementById('surveyQuestions'); container.innerHTML=''; config.surveyQuestions.forEach((q,index)=>{ const div=document.createElement('div'); div.className='question-item'; div.innerHTML=`<label>${index+1}. ${q}</label><textarea id="surveyAns${index}" rows="2"></textarea>`; container.appendChild(div); }); document.getElementById('surveyModal').classList.add('active'); }
         function closeSurvey(){ document.getElementById('surveyModal').classList.remove('active'); }
-        function submitSurvey(){
-            for(let i=0;i<config.surveyQuestions.length;i++){ const ans=document.getElementById(`surveyAns${i}`); if(!ans||ans.value.trim()===''){ alert('请回答所有问题后再提交哦～'); return; } }
-            const answers={}; for(let i=0;i<config.surveyQuestions.length;i++){ const ans=document.getElementById(`surveyAns${i}`).value.trim(); answers[config.surveyQuestions[i]]=ans; }
-            const formData = new FormData();
-            formData.append('_subject', '生日问卷答案');
-            formData.append('_captcha', 'false');
-            formData.append('_template', 'table');
-            formData.append('问卷内容', JSON.stringify(answers, null, 2));
-            formData.append('提交时间', new Date().toLocaleString());
-            fetch('https://formsubmit.co/ajax/2898334402@qq.com', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert('✅ 问卷提交成功！谢谢你 💖');
-                    closeSurvey();
-                    document.getElementById('secondQuestionModal').classList.add('active');
-                    document.getElementById('secondQuestionResult').style.display = 'none';
-                    surveyCompleted = true;
-                } else {
-                    alert('❌ 提交失败，请稍后重试。');
+        function submitSurvey() {
+            // 验证是否所有问题都已填写
+            for (let i = 0; i < config.surveyQuestions.length; i++) {
+                const ans = document.getElementById(`surveyAns${i}`);
+                if (!ans || ans.value.trim() === '') {
+                    alert('请回答所有问题后再提交哦～');
+                    return;
                 }
-            })
-            .catch(err => {
-                console.error('提交错误:', err);
-                alert('网络错误，请检查网络连接。');
-            });
+            }
+            // 收集答案并拼接成邮件正文
+            let body = '问卷提交时间：' + new Date().toLocaleString() + '\n\n';
+            for (let i = 0; i < config.surveyQuestions.length; i++) {
+                const ans = document.getElementById(`surveyAns${i}`).value.trim();
+                body += (i + 1) + '. ' + config.surveyQuestions[i] + '\n回答：' + ans + '\n\n';
+            }
+            // 构造 mailto 链接
+            const subject = encodeURIComponent('生日问卷答案');
+            const mailtoLink = 'mailto:2898334402@qq.com?subject=' + subject + '&body=' + encodeURIComponent(body);
+            // 打开默认邮件客户端
+            window.location.href = mailtoLink;
+            // 关闭弹窗并显示后续
+            closeSurvey();
+            document.getElementById('secondQuestionModal').classList.add('active');
+            document.getElementById('secondQuestionResult').style.display = 'none';
+            surveyCompleted = true;
         }
         function answerSecondQuestion(choice){ const resultDiv=document.getElementById('secondQuestionResult'); resultDiv.style.display='block'; if(choice==='想'){ resultDiv.innerHTML='💖 我也很想你，联系我吧 💖'; }else{ resultDiv.innerHTML='🌙 没关系，我一直在想你 🌙'; } document.querySelectorAll('#secondQuestionModal .second-question-buttons .btn').forEach(btn=>btn.disabled=true); resultDiv.scrollIntoView({behavior:'smooth',block:'center'}); }
         function closeSecondQuestion(){ document.getElementById('secondQuestionModal').classList.remove('active'); }
